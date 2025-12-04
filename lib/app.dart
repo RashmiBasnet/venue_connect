@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:venue_connect/screen/splash_screen.dart';
 
-// your colors
 const kPrimaryDark = Color(0xFF233041);
 const kAccentGold  = Color(0xFFAE8E54);
 const kSoftNeutral = Color(0xFFC4B6AB);
