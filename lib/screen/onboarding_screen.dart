@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../app.dart'; // MAKE SURE this file contains kAccentGold & kSoftNeutral
+import 'package:venue_connect/screen/login_screen.dart';
+import '../app.dart'; 
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
@@ -38,8 +39,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
 
   void _goNext() {
     if (_currentPage == 2) {
-      // TODO -> Go to Login Screen
-      // Navigator.pushReplacement(...)
+      Navigator.pushReplacement(
+        context, 
+        MaterialPageRoute(builder: (context) => LoginScreen())
+      );
     } else {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -101,7 +104,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 ),
               ),
 
-              // DOT INDICATOR
+              // Dot Indicator
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(3, (index) {
@@ -114,8 +117,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
 
                     decoration: BoxDecoration(
                       color: _currentPage == index
-                          ? kAccentGold        // changed
-                          : Colors.grey[300],  // instead of kSoftNeutral
+                          ? kAccentGold        
+                          : Colors.grey[300],  
                       borderRadius: BorderRadius.circular(10),
                     ),
                   );
@@ -124,7 +127,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
 
               const SizedBox(height: 20),
 
-              // BUTTON
+              // Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
