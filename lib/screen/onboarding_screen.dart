@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:venue_connect/screen/login_screen.dart';
-import '../app.dart'; 
+import '../app.dart';
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
@@ -40,8 +40,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   void _goNext() {
     if (_currentPage == 2) {
       Navigator.pushReplacement(
-        context, 
-        MaterialPageRoute(builder: (context) => LoginScreen())
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     } else {
       _pageController.nextPage(
@@ -53,13 +53,17 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
+              // TOP: page content (image + texts)
               Expanded(
+                flex: 7,
                 child: PageView.builder(
                   controller: _pageController,
                   itemCount: 3,
@@ -72,30 +76,46 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset(_images[index]),
-
-                        const SizedBox(height: 10),
-
-                        Text(
-                          _titles[index],
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 28,
-                            fontWeight: FontWeight.w600,
+                        // IMAGE
+                        Flexible(
+                          flex: 5,
+                          child: Image.asset(
+                            _images[index],
+                            height: screenHeight * 0.40,
+                            fit: BoxFit.contain,
                           ),
                         ),
 
-                        const SizedBox(height: 5),
+                        SizedBox(height: screenHeight * 0.03),
 
-                        Text(
-                          _subtitles[index],
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w300,
-                            color: Colors.black.withOpacity(0.7),
+                        // TITLE
+                        Flexible(
+                          flex: 2,
+                          child: Text(
+                            _titles[index],
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 28,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: screenHeight * 0.015),
+
+                        // SUBTITLE
+                        Flexible(
+                          flex: 2,
+                          child: Text(
+                            _subtitles[index],
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.black.withOpacity(0.7),
+                            ),
                           ),
                         ),
                       ],
@@ -104,42 +124,49 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 ),
               ),
 
-              // Dot Indicator
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(3, (index) {
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: _currentPage == index ? 16 : 8,
-                    height: 8,
-
-                    decoration: BoxDecoration(
-                      color: _currentPage == index
-                          ? kAccentGold        
-                          : Colors.grey[300],  
-                      borderRadius: BorderRadius.circular(10),
+              // BOTTOM: dots + button (fixed area)
+              Expanded(
+                flex: 3,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    // Dot Indicator
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(3, (index) {
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: _currentPage == index ? 16 : 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: _currentPage == index
+                                ? kAccentGold
+                                : Colors.grey[300],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        );
+                      }),
                     ),
-                  );
-                }),
-              ),
 
-              const SizedBox(height: 20),
+                    SizedBox(height: screenHeight * 0.02),
 
-              // Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _goNext,
-                  child: Text(
-                    _currentPage == 2 ? "Get Started" : "Next",
-                    style: const TextStyle(fontFamily: 'Poppins'),
-                  ),
+                    // Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _goNext,
+                        child: Text(
+                          _currentPage == 2 ? "Get Started" : "Next",
+                          style: const TextStyle(fontFamily: 'Poppins'),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: screenHeight * 0.03),
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 20),
             ],
           ),
         ),
