@@ -31,7 +31,6 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
       controller: widget.controller,
       obscureText: widget.isPassword ? _obscureText : false,
       style: const TextStyle(
-        fontFamily: "Poppins",
         fontSize: 15,
       ),
       decoration: InputDecoration(
@@ -70,14 +69,12 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
         // Label + Hint
         labelText: widget.label,
         labelStyle: const TextStyle(
-          fontFamily: "Poppins",
+          fontFamily: "Poppins Regular",
           fontSize: 15,
-          fontWeight: FontWeight.w600,
           color: Colors.black87,
         ),
         hintText: widget.hint,
         hintStyle: TextStyle(
-          fontFamily: "Poppins",
           fontSize: 14,
           color: Colors.grey.shade400,
         ),

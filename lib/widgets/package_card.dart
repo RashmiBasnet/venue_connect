@@ -52,9 +52,8 @@ class PackageCard extends StatelessWidget {
             child: Text(
               title,
               style: const TextStyle(
-                fontFamily: 'Poppins',
+                fontFamily: "Poppins SemiBold",
                 fontSize: 16,
-                fontWeight: FontWeight.w600,
                 color: kPrimaryDark,
               ),
             ),
@@ -78,9 +77,8 @@ class PackageCard extends StatelessWidget {
                 child: const Text(
                   "View Details",
                   style: TextStyle(
-                    fontFamily: 'Poppins',
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    fontFamily: "Poppins Medium"
                   ),
                 ),
               ),

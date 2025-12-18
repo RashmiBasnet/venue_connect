@@ -52,9 +52,8 @@ class VenueCard extends StatelessWidget {
             child: Text(
               name,
               style: const TextStyle(
-                fontFamily: 'Poppins',
+                fontFamily: "Poppins SemiBold",
                 fontSize: 18,
-                fontWeight: FontWeight.w600,
                 color: kPrimaryDark,
               ),
             ),
@@ -67,7 +66,6 @@ class VenueCard extends StatelessWidget {
             child: Text(
               address,
               style: const TextStyle(
-                fontFamily: 'Poppins',
                 fontSize: 13,
                 color: Colors.grey,
               ),
@@ -96,9 +94,8 @@ class VenueCard extends StatelessWidget {
                 child: const Text(
                   "Reserve",
                   style: TextStyle(
-                    fontFamily: 'Poppins',
+                    fontFamily: "Poppins Medium",
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
