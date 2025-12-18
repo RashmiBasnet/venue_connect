@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:venue_connect/screen/bottom_screen_layout.dart';
 import 'package:venue_connect/screen/onboarding_screen.dart';
 import 'package:venue_connect/widgets/my_textform_field.dart';
 import 'package:venue_connect/widgets/social_button.dart';
 import '../app.dart';
 import 'register_screen.dart';
-import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const BottomScreenLayout()),
       );
     }
   }
@@ -97,9 +97,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Text(
                         "Login",
                         style: TextStyle(
-                          fontFamily: 'Poppins',
+                          fontFamily: "Poppins SemiBold",
                           fontSize: 32,
-                          fontWeight: FontWeight.w600,
                           color: kPrimaryDark,
                         ),
                       ),
@@ -109,7 +108,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Text(
                         "Welcome back!\nPlease login to continue",
                         style: TextStyle(
-                          fontFamily: 'Poppins',
                           fontSize: 14,
                           color: Colors.grey,
                         ),
@@ -161,9 +159,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: const Text(
                                   "Login",
                                   style: TextStyle(
-                                    fontFamily: 'Poppins',
+                                    fontFamily: "Poppins Medium",
                                     fontSize: 16,
-                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ),
@@ -178,7 +175,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: const Text(
                                   "Forgot Password",
                                   style: TextStyle(
-                                    fontFamily: 'Poppins',
                                     fontSize: 14,
                                     color: kAccentGold,
                                   ),
@@ -193,7 +189,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: Text(
                                 "Or Continue with Social Accounts",
                                 style: TextStyle(
-                                  fontFamily: 'Poppins',
                                   fontSize: 14,
                                   color: Colors.grey,
                                 ),
@@ -222,7 +217,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 const Text(
                                   "Don’t have an account? ",
                                   style: TextStyle(
-                                    fontFamily: 'Poppins',
                                     fontSize: 14,
                                     color: Colors.grey,
                                   ),
@@ -232,9 +226,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: const Text(
                                     "Create Now",
                                     style: TextStyle(
-                                      fontFamily: 'Poppins',
+                                      fontFamily: "Poppins SemiBold",
                                       fontSize: 14,
-                                      fontWeight: FontWeight.w600,
                                       color: kAccentGold,
                                     ),
                                   ),
