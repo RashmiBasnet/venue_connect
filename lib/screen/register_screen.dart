@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../app.dart';
 import '../widgets/my_textform_field.dart';
 import 'login_screen.dart';
-import 'home_screen.dart';
+import 'bottom_screen/home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -108,9 +108,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const Text(
                         "Create Account",
                         style: TextStyle(
-                          fontFamily: 'Poppins',
+                          fontFamily: "Poppins SemiBold",
                           fontSize: 28,
-                          fontWeight: FontWeight.w600,
                           color: kPrimaryDark,
                         ),
                       ),
@@ -120,7 +119,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Text(
                         "Sign up to get started with VenueConnect.",
                         style: TextStyle(
-                          fontFamily: 'Poppins',
                           fontSize: 14,
                           color: Colors.black.withOpacity(0.7),
                         ),
@@ -194,9 +192,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 child: const Text(
                                   "Create Account",
                                   style: TextStyle(
-                                    fontFamily: 'Poppins',
+                                    fontFamily: "Poppins Medium",
                                     fontSize: 16,
-                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ),
@@ -211,7 +208,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 const Text(
                                   "Already have an account? ",
                                   style: TextStyle(
-                                    fontFamily: 'Poppins',
                                     fontSize: 14,
                                     color: Colors.grey,
                                   ),
@@ -221,9 +217,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   child: const Text(
                                     "Login",
                                     style: TextStyle(
-                                      fontFamily: 'Poppins',
+                                      fontFamily: "Poppins SemiBold",
                                       fontSize: 14,
-                                      fontWeight: FontWeight.w600,
                                       color: kAccentGold,
                                     ),
                                   ),

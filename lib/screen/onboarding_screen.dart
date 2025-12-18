@@ -95,9 +95,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                             _titles[index],
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                              fontFamily: 'Poppins',
+                              fontFamily: "Poppins SemiBold",
                               fontSize: 28,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
@@ -111,9 +110,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                             _subtitles[index],
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontFamily: 'Poppins',
+                              fontFamily: "Poppins Regular",
                               fontSize: 16,
-                              fontWeight: FontWeight.w300,
                               color: Colors.black.withOpacity(0.7),
                             ),
                           ),
@@ -158,7 +156,6 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                         onPressed: _goNext,
                         child: Text(
                           _currentPage == 2 ? "Get Started" : "Next",
-                          style: const TextStyle(fontFamily: 'Poppins'),
                         ),
                       ),
                     ),
