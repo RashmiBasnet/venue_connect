@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:venue_connect/screen/bottom_screen_layout.dart';
-import 'package:venue_connect/screen/onboarding_screen.dart';
-import 'package:venue_connect/widgets/my_textform_field.dart';
-import 'package:venue_connect/widgets/social_button.dart';
-import '../app.dart';
+import 'package:venue_connect/core/widgets/social_button.dart';
+import 'package:venue_connect/features/dashboard/presentation/pages/bottom_screen_layout.dart';
+import 'package:venue_connect/features/onboarding/presentation/pages/onboarding_screen.dart';
+import 'package:venue_connect/core/widgets/my_textform_field.dart';
+import '../../../../app/app.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {

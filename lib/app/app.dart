@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:venue_connect/app/theme/theme_data.dart';
 import 'package:venue_connect/screen/splash_screen.dart';
-import 'package:venue_connect/theme/theme_data.dart';
 
 const kPrimaryDark = Color(0xFF233041);
 const kAccentGold  = Color(0xFFAE8E54);
