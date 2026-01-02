@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import '../app/app.dart';
-import '../widgets/my_textform_field.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:venue_connect/features/auth/presentation/view_model/user_viewmodel.dart';
+import '../../../../app/app.dart';
+import '../../../../core/widgets/my_textform_field.dart';
 import 'login_screen.dart';
-import 'bottom_screen/home_screen.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final TextEditingController _nameController = TextEditingController();
@@ -31,17 +32,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _signUp() {
     if (_formKey.currentState!.validate()) {
-      if (_passwordController.text != _confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Passwords do not match")),
-        );
-        return;
-      }
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
+      ref.read(userViewmodelProvider.notifier).register(
+            fullName: _nameController.text.trim(),
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
     }
   }
 

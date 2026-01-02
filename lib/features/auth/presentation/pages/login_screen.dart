@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:venue_connect/app/routes/app_routes.dart';
+import 'package:venue_connect/core/utils/snackbar_utils.dart';
 import 'package:venue_connect/core/widgets/social_button.dart';
+import 'package:venue_connect/features/auth/presentation/state/user_state.dart';
+import 'package:venue_connect/features/auth/presentation/view_model/user_viewmodel.dart';
 import 'package:venue_connect/features/dashboard/presentation/pages/bottom_screen_layout.dart';
 import 'package:venue_connect/features/onboarding/presentation/pages/onboarding_screen.dart';
 import 'package:venue_connect/core/widgets/my_textform_field.dart';
 import '../../../../app/app.dart';
 import 'register_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final TextEditingController _emailController = TextEditingController();
@@ -26,12 +31,12 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _login() {
+  Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const BottomScreenLayout()),
-      );
+      await ref.read(userViewmodelProvider.notifier).login(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
     }
   }
 
@@ -47,6 +52,14 @@ class _LoginScreenState extends State<LoginScreen> {
     final size = MediaQuery.of(context).size;
     final screenWidth = size.width;
     final bool isTablet = screenWidth >= 600;
+
+    ref.listen<UserState>(userViewmodelProvider, (previous, next) {
+      if (next.status == UserStatus.authenticated) {
+        AppRoutes.pushReplacement(context, const BottomScreenLayout());
+      } else if (next.status == UserStatus.error) {
+        SnackbarUtils.showError(context, next.errorMessage ?? "An error occurred");
+      }
+    });
 
     return Scaffold(
       body: SafeArea(
