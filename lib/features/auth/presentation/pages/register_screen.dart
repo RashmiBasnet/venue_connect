@@ -130,8 +130,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               label: "Full Name",
                               hint: "Enter your full name",
                               controller: _nameController,
-                              errorMessage: "Full name is required",
                               icon: Icons.person_outline,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a password';
+                                }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                return null;
+                              },
                             ),
 
                             const SizedBox(height: 16),
@@ -141,8 +149,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               label: "Email Address",
                               hint: "Your email address",
                               controller: _emailController,
-                              errorMessage: "Email is required",
                               icon: Icons.email_outlined,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your email';
+                                }
+                                if (!RegExp(
+                                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                ).hasMatch(value)) {
+                                  return 'Please enter a valid email';
+                                }
+                                return null;
+                              },
                             ),
 
                             const SizedBox(height: 16),
@@ -152,9 +170,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               label: "Password",
                               hint: "Create a password",
                               controller: _passwordController,
-                              errorMessage: "Password is required",
                               icon: Icons.lock_outline,
                               isPassword: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a password';
+                                }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                return null;
+                              },
                             ),
 
                             const SizedBox(height: 16),
@@ -164,9 +190,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               label: "Confirm Password",
                               hint: "Re-enter your password",
                               controller: _confirmPasswordController,
-                              errorMessage: "Confirmation is required",
                               icon: Icons.lock_outline,
                               isPassword: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a password';
+                                }
+                                if (value != _passwordController.text) {
+                                  return 'Password do not match';
+                                }
+                                return null;
+                              },
                             ),
 
                             const SizedBox(height: 30),

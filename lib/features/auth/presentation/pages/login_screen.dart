@@ -137,8 +137,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               label: "Email Address",
                               hint: "Your email address",
                               controller: _emailController,
-                              errorMessage: "Email is required",
                               icon: Icons.email_outlined,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your email';
+                                }
+                                if (!RegExp(
+                                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                ).hasMatch(value)) {
+                                  return 'Please enter a valid email';
+                                }
+                                return null;
+                              },
                             ),
 
                             const SizedBox(height: 16),
@@ -148,9 +158,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               label: "Password",
                               hint: "Enter your password",
                               controller: _passwordController,
-                              errorMessage: "Password is required",
                               icon: Icons.lock_outline,
                               isPassword: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a password';
+                                }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                return null;
+                              },
                             ),
 
                             const SizedBox(height: 30),
