@@ -23,6 +23,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -159,7 +160,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               hint: "Enter your password",
                               controller: _passwordController,
                               icon: Icons.lock_outline,
-                              isPassword: true,
+                              isPassword: _obscurePassword,
+                              suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                            ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter a password';

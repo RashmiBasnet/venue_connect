@@ -21,6 +21,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -171,7 +174,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               hint: "Create a password",
                               controller: _passwordController,
                               icon: Icons.lock_outline,
-                              isPassword: true,
+                              isPassword: _obscurePassword,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter a password';
@@ -191,7 +207,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               hint: "Re-enter your password",
                               controller: _confirmPasswordController,
                               icon: Icons.lock_outline,
-                              isPassword: true,
+                              isPassword: _obscureConfirmPassword,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscureConfirmPassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscureConfirmPassword = !_obscureConfirmPassword;
+                                  });
+                                },
+                              ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter a password';
