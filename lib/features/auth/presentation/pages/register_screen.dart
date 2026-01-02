@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:venue_connect/features/auth/presentation/state/user_state.dart';
 import 'package:venue_connect/features/auth/presentation/view_model/user_viewmodel.dart';
 import '../../../../app/app.dart';
 import '../../../../core/widgets/my_textform_field.dart';
@@ -55,6 +56,32 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final size = MediaQuery.of(context).size;
     final screenWidth = size.width;
     final bool isTablet = screenWidth >= 600;
+
+    // Listen to user state changes
+    ref.listen(userViewmodelProvider, (previous, next) {
+      if (next.status == UserStatus.registered) {
+        // Registration successful
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Registration successful! Please login.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Navigate to login screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      } else if (next.status == UserStatus.error) {
+        // Registration failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage ?? 'Registration failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    });
 
     return Scaffold(
       body: SafeArea(
@@ -136,10 +163,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               icon: Icons.person_outline,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter a password';
+                                  return 'Please enter your full name';
                                 }
-                                if (value.length < 6) {
-                                  return 'Password must be at least 6 characters';
+                                if (value.length < 2) {
+                                  return 'Full name must be at least 2 characters';
                                 }
                                 return null;
                               },

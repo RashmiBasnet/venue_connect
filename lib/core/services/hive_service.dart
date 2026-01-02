@@ -15,6 +15,7 @@ class HiveService {
     final path = '${directory.path}/${HiveTableConstant.dbName}';
     Hive.init(path);
     _registerAdapter();
+    await openBoxes();
   }
   
   // Register Adapter
@@ -38,9 +39,13 @@ class HiveService {
   Box<UserHiveModel> get _userBox => Hive.box<UserHiveModel>(HiveTableConstant.userTable);
 
   // Register
-  Future<UserHiveModel> registerUser(UserHiveModel model) async {
-    await _userBox.put(model.userId, model);
-    return model;
+  Future<bool> registerUser(UserHiveModel model) async {
+    try {
+      await _userBox.put(model.userId, model);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   // Login

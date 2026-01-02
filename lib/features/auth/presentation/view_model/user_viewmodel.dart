@@ -34,7 +34,7 @@ class UserViewmodel extends Notifier<UserState>{
       },
       (isRegistered) {
         if(isRegistered){
-          state = state.copyWith(status: UserStatus.registerd);
+          state = state.copyWith(status: UserStatus.registered);
         } else {
           state = state.copyWith(
             status: UserStatus.error,

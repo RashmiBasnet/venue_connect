@@ -6,7 +6,7 @@ enum UserStatus {
   loading,
   authenticated,
   unauthenticated,
-  registerd,
+  registered,
   error,
 }
 
