@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import '../app.dart';
-import '../widgets/my_textform_field.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:venue_connect/features/auth/presentation/state/user_state.dart';
+import 'package:venue_connect/features/auth/presentation/view_model/user_viewmodel.dart';
+import '../../../../app/app.dart';
+import '../../../../core/widgets/my_textform_field.dart';
 import 'login_screen.dart';
-import 'bottom_screen/home_screen.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final TextEditingController _nameController = TextEditingController();
@@ -19,6 +21,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
@@ -31,17 +36,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _signUp() {
     if (_formKey.currentState!.validate()) {
-      if (_passwordController.text != _confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Passwords do not match")),
-        );
-        return;
-      }
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
+      ref.read(userViewmodelProvider.notifier).register(
+            fullName: _nameController.text.trim(),
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
     }
   }
 
@@ -57,6 +56,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final size = MediaQuery.of(context).size;
     final screenWidth = size.width;
     final bool isTablet = screenWidth >= 600;
+
+    // Listen to user state changes
+    ref.listen(userViewmodelProvider, (previous, next) {
+      if (next.status == UserStatus.registered) {
+        // Registration successful
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Registration successful! Please login.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Navigate to login screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      } else if (next.status == UserStatus.error) {
+        // Registration failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage ?? 'Registration failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    });
 
     return Scaffold(
       body: SafeArea(
@@ -135,8 +160,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               label: "Full Name",
                               hint: "Enter your full name",
                               controller: _nameController,
-                              errorMessage: "Full name is required",
                               icon: Icons.person_outline,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your full name';
+                                }
+                                if (value.length < 2) {
+                                  return 'Full name must be at least 2 characters';
+                                }
+                                return null;
+                              },
                             ),
 
                             const SizedBox(height: 16),
@@ -146,8 +179,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               label: "Email Address",
                               hint: "Your email address",
                               controller: _emailController,
-                              errorMessage: "Email is required",
                               icon: Icons.email_outlined,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your email';
+                                }
+                                if (!RegExp(
+                                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                ).hasMatch(value)) {
+                                  return 'Please enter a valid email';
+                                }
+                                return null;
+                              },
                             ),
 
                             const SizedBox(height: 16),
@@ -157,9 +200,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               label: "Password",
                               hint: "Create a password",
                               controller: _passwordController,
-                              errorMessage: "Password is required",
                               icon: Icons.lock_outline,
-                              isPassword: true,
+                              isPassword: _obscurePassword,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a password';
+                                }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                return null;
+                              },
                             ),
 
                             const SizedBox(height: 16),
@@ -169,9 +233,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               label: "Confirm Password",
                               hint: "Re-enter your password",
                               controller: _confirmPasswordController,
-                              errorMessage: "Confirmation is required",
                               icon: Icons.lock_outline,
-                              isPassword: true,
+                              isPassword: _obscureConfirmPassword,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscureConfirmPassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscureConfirmPassword = !_obscureConfirmPassword;
+                                  });
+                                },
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a password';
+                                }
+                                if (value != _passwordController.text) {
+                                  return 'Password do not match';
+                                }
+                                return null;
+                              },
                             ),
 
                             const SizedBox(height: 30),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:venue_connect/app.dart';
-import 'package:venue_connect/widgets/package_card.dart';
-import 'package:venue_connect/widgets/venue_card.dart';
+import 'package:venue_connect/app/app.dart';
+import 'package:venue_connect/core/widgets/package_card.dart';
+import 'package:venue_connect/core/widgets/venue_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

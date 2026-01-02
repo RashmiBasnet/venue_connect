@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:venue_connect/screen/bottom_screen/activity_screen.dart';
-import 'package:venue_connect/screen/bottom_screen/home_screen.dart';
-import 'package:venue_connect/screen/bottom_screen/package_screen.dart';
-import 'package:venue_connect/screen/bottom_screen/profile_screen.dart';
-import 'package:venue_connect/screen/bottom_screen/venue_screen.dart';
-
+import 'package:venue_connect/features/dashboard/presentation/pages/bottom_screen/activity_screen.dart';
+import 'package:venue_connect/features/dashboard/presentation/pages/bottom_screen/home_screen.dart';
+import 'package:venue_connect/features/dashboard/presentation/pages/bottom_screen/package_screen.dart';
+import 'package:venue_connect/features/dashboard/presentation/pages/bottom_screen/profile_screen.dart';
+import 'package:venue_connect/features/dashboard/presentation/pages/bottom_screen/venue_screen.dart';
 class BottomScreenLayout extends StatefulWidget {
   const BottomScreenLayout({super.key});
 

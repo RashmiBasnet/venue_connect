@@ -1,7 +1,7 @@
 // VENUE CARD WIDGET
 import 'package:flutter/material.dart';
 
-import '../app.dart';
+import '../../app/app.dart';
 
 class VenueCard extends StatelessWidget {
   final String imagePath;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:venue_connect/screen/login_screen.dart';
-import '../app.dart';
+import 'package:venue_connect/features/auth/presentation/pages/login_screen.dart';
+import '../../../../app/app.dart';
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});

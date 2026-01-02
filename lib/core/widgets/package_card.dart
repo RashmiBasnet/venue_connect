@@ -1,7 +1,7 @@
 // PACKAGE CARD WIDGET
 import 'package:flutter/material.dart';
 
-import '../app.dart';
+import '../../app/app.dart';
 
 class PackageCard extends StatelessWidget {
   final String imagePath;

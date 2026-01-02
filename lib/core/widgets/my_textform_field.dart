@@ -1,35 +1,32 @@
 import 'package:flutter/material.dart';
 
-class MyTextFormField extends StatefulWidget {
+class MyTextFormField extends StatelessWidget {
   final String label;
   final String hint;
-  final String errorMessage;
+  final String? errorMessage;
   final TextEditingController controller;
   final IconData icon;
   final bool isPassword;
+  final Widget? suffixIcon;
+  final String? Function(String?)? validator;
 
   const MyTextFormField({
     super.key,
     required this.label,
     required this.hint,
-    required this.errorMessage,
+    this.errorMessage,
     required this.controller,
     required this.icon,
     this.isPassword = false,
+    this.suffixIcon,
+    this.validator,
   });
-
-  @override
-  State<MyTextFormField> createState() => _MyTextFormFieldState();
-}
-
-class _MyTextFormFieldState extends State<MyTextFormField> {
-  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: widget.controller,
-      obscureText: widget.isPassword ? _obscureText : false,
+      controller: controller,
+      obscureText: isPassword,
       style: const TextStyle(
         fontSize: 15,
       ),
@@ -38,18 +35,25 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
         fillColor: Colors.white,
 
         // Border Style
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(
+            color: Colors.grey.shade300,
+            width: 2,
+          ),
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: Colors.grey.shade300,
-            width: 1,
+            width: 2,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: Colors.grey.shade400,
-            width: 1.2,
+            width: 2,
           ),
         ),
         errorBorder: OutlineInputBorder(
@@ -62,41 +66,29 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
 
         // Icon(left)
         prefixIcon: Icon(
-          widget.icon,
+          icon,
           color: Colors.grey.shade500,
         ),
 
         // Label + Hint
-        labelText: widget.label,
+        labelText: label,
         labelStyle: const TextStyle(
           fontFamily: "Poppins Regular",
           fontSize: 15,
           color: Colors.black87,
         ),
-        hintText: widget.hint,
+        hintText: hint,
         hintStyle: TextStyle(
           fontSize: 14,
           color: Colors.grey.shade400,
         ),
 
         // password (eye icon)
-        suffixIcon: widget.isPassword
-            ? IconButton(
-                icon: Icon(
-                  _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.grey.shade500,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscureText = !_obscureText;
-                  });
-                },
-              )
-            : null,
+        suffixIcon: suffixIcon,
       ),
-      validator: (value) {
+      validator: validator ?? (value) {
         if (value == null || value.trim().isEmpty) {
-          return widget.errorMessage;
+          return errorMessage;
         }
         return null;
       },
