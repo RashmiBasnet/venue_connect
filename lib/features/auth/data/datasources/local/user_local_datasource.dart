@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:venue_connect/core/services/hive_service.dart';
+import 'package:venue_connect/core/services/hive/hive_service.dart';
 import 'package:venue_connect/features/auth/data/datasources/user_datasource.dart';
 import 'package:venue_connect/features/auth/data/models/user_hive_model.dart';
 
@@ -8,11 +8,11 @@ final userLocalDatasourceProvider = Provider<UserLocalDatasource>((ref) {
   return UserLocalDatasource(hiveService: hiveService);
 });
 
-class UserLocalDatasource implements IUserDatasource{
+class UserLocalDatasource implements IUserLocalDatasource {
   final HiveService _hiveService;
 
-  UserLocalDatasource({required HiveService hiveService}) : _hiveService = hiveService;
-
+  UserLocalDatasource({required HiveService hiveService})
+    : _hiveService = hiveService;
 
   @override
   Future<UserHiveModel?> getCurrentUser() {
@@ -31,9 +31,9 @@ class UserLocalDatasource implements IUserDatasource{
   }
 
   @override
-  Future<UserHiveModel?> login(String email, String password) async{
+  Future<UserHiveModel?> login(String email, String password) async {
     try {
-      final user =  await _hiveService.loginUser(email, password);
+      final user = await _hiveService.loginUser(email, password);
       return Future.value(user);
     } catch (e) {
       return Future.value(null);
@@ -41,7 +41,7 @@ class UserLocalDatasource implements IUserDatasource{
   }
 
   @override
-  Future<bool> logout() async{
+  Future<bool> logout() async {
     try {
       await _hiveService.logoutUser();
       return Future.value(true);
@@ -51,14 +51,7 @@ class UserLocalDatasource implements IUserDatasource{
   }
 
   @override
-  Future<bool> register(UserHiveModel model) async {
-    try {
-      await _hiveService.registerUser(model);
-      return Future.value(true);
-    } catch (e) {
-      return Future.value(false);
-    }
+  Future<UserHiveModel> register(UserHiveModel model) async {
+    return await _hiveService.registerUser(model);
   }
-  
-
 }
