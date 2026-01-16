@@ -7,19 +7,21 @@ import 'package:venue_connect/features/auth/data/repositories/user_repository.da
 import 'package:venue_connect/features/auth/domain/entities/user_entity.dart';
 import 'package:venue_connect/features/auth/domain/repositories/user_repository.dart';
 
-class RegisterUsecaseParams extends Equatable{
+class RegisterUsecaseParams extends Equatable {
   final String fullName;
   final String email;
   final String password;
+  final String confirmPassword;
 
   const RegisterUsecaseParams({
     required this.fullName,
     required this.email,
     required this.password,
+    required this.confirmPassword,
   });
 
   @override
-  List<Object?> get props => [fullName, email, password];
+  List<Object?> get props => [fullName, email, password, confirmPassword];
 }
 
 // Provider
@@ -28,11 +30,12 @@ final registerUsecaseProvider = Provider<RegisterUsecase>((ref) {
   return RegisterUsecase(userRepository: userRepository);
 });
 
-class RegisterUsecase implements UsecaseWithParams<bool, RegisterUsecaseParams> {
+class RegisterUsecase
+    implements UsecaseWithParams<bool, RegisterUsecaseParams> {
   final IUserRepository _userRepository;
 
   RegisterUsecase({required IUserRepository userRepository})
-      : _userRepository = userRepository;
+    : _userRepository = userRepository;
 
   @override
   Future<Either<Failure, bool>> call(RegisterUsecaseParams params) {
@@ -40,6 +43,7 @@ class RegisterUsecase implements UsecaseWithParams<bool, RegisterUsecaseParams> 
       fullName: params.fullName,
       email: params.email,
       password: params.password,
+      confirmPassword: params.confirmPassword,
     );
     return _userRepository.register(entity);
   }
