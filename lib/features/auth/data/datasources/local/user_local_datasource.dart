@@ -1,18 +1,27 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:venue_connect/core/services/hive_service.dart';
+import 'package:venue_connect/core/services/hive/hive_service.dart';
+import 'package:venue_connect/core/services/storage/user_session_storage.dart';
 import 'package:venue_connect/features/auth/data/datasources/user_datasource.dart';
 import 'package:venue_connect/features/auth/data/models/user_hive_model.dart';
 
 final userLocalDatasourceProvider = Provider<UserLocalDatasource>((ref) {
-  final hiveService = ref.watch(hiveServiceProvider);
-  return UserLocalDatasource(hiveService: hiveService);
+  final hiveService = ref.read(hiveServiceProvider);
+  final userSessionService = ref.read(userSessionServiceProvider);
+  return UserLocalDatasource(
+    hiveService: hiveService,
+    userSessionService: userSessionService,
+  );
 });
 
-class UserLocalDatasource implements IUserDatasource{
+class UserLocalDatasource implements IUserLocalDatasource {
   final HiveService _hiveService;
+  final UserSessionService _userSessionService;
 
-  UserLocalDatasource({required HiveService hiveService}) : _hiveService = hiveService;
-
+  UserLocalDatasource({
+    required HiveService hiveService,
+    required UserSessionService userSessionService,
+  }) : _hiveService = hiveService,
+       _userSessionService = userSessionService;
 
   @override
   Future<UserHiveModel?> getCurrentUser() {
@@ -31,19 +40,27 @@ class UserLocalDatasource implements IUserDatasource{
   }
 
   @override
-  Future<UserHiveModel?> login(String email, String password) async{
+  Future<UserHiveModel?> login(String email, String password) async {
     try {
-      final user =  await _hiveService.loginUser(email, password);
-      return Future.value(user);
+      final user = await _hiveService.loginUser(email, password);
+      if (user != null && user.userId != null) {
+        // Save user session to SharedPreferences
+        await _userSessionService.saveUserSession(
+          userId: user.userId!,
+          email: user.email,
+          fullName: user.fullName,
+        );
+      }
+      return user;
     } catch (e) {
       return Future.value(null);
     }
   }
 
   @override
-  Future<bool> logout() async{
+  Future<bool> logout() async {
     try {
-      await _hiveService.logoutUser();
+      await _userSessionService.clearUserSession();
       return Future.value(true);
     } catch (e) {
       return Future.value(false);
@@ -51,14 +68,7 @@ class UserLocalDatasource implements IUserDatasource{
   }
 
   @override
-  Future<bool> register(UserHiveModel model) async {
-    try {
-      await _hiveService.registerUser(model);
-      return Future.value(true);
-    } catch (e) {
-      return Future.value(false);
-    }
+  Future<UserHiveModel> register(UserHiveModel model) async {
+    return await _hiveService.registerUser(model);
   }
-  
-
 }

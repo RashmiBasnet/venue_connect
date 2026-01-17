@@ -39,13 +39,9 @@ class HiveService {
   Box<UserHiveModel> get _userBox => Hive.box<UserHiveModel>(HiveTableConstant.userTable);
 
   // Register
-  Future<bool> registerUser(UserHiveModel model) async {
-    try {
-      await _userBox.put(model.userId, model);
-      return true;
-    } catch (e) {
-      return false;
-    }
+  Future<UserHiveModel> registerUser(UserHiveModel model) async {
+    await _userBox.put(model.userId, model);
+    return model;
   }
 
   // Login

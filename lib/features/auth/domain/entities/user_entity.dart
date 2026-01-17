@@ -5,12 +5,14 @@ class UserEntity extends Equatable {
   final String fullName;
   final String email;
   final String? password;
+  final String? confirmPassword;
 
   const UserEntity({
     this.userId,
     required this.fullName,
     required this.email,
-    this.password
+    this.password,
+    this.confirmPassword,
   });
 
   @override
@@ -18,6 +20,7 @@ class UserEntity extends Equatable {
     userId,
     fullName,
     email,
-    password
+    password,
+    confirmPassword,
   ];
 }

@@ -36,10 +36,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   void _signUp() {
     if (_formKey.currentState!.validate()) {
-      ref.read(userViewmodelProvider.notifier).register(
+      ref
+          .read(userViewmodelProvider.notifier)
+          .register(
             fullName: _nameController.text.trim(),
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
+            confirmPassword: _confirmPasswordController.text.trim(),
           );
     }
   }
@@ -106,7 +109,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             Align(
               alignment: Alignment.topCenter,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     // prevent stretching on larger screens
@@ -244,7 +250,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    _obscureConfirmPassword = !_obscureConfirmPassword;
+                                    _obscureConfirmPassword =
+                                        !_obscureConfirmPassword;
                                   });
                                 },
                               ),
@@ -268,8 +275,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 onPressed: _signUp,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: kAccentGold,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
                                   ),
