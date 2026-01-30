@@ -85,6 +85,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     try {
       if (allowMultiple) return;
 
+      // Android 13+ uses photos (READ_MEDIA_IMAGES)
+      bool ok = await _requestPermission(Permission.photos);
+
+      // Older Android fallback
+      if (!ok) {
+        ok = await _requestPermission(Permission.storage);
+      }
+
+      if (!ok) return;
+
       final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 80,
@@ -145,6 +155,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final userSessionService = ref.watch(userSessionServiceProvider);
 
     final userName = userSessionService.getCurrentUserFullName() ?? "User";
+    final userEmail =
+        userSessionService.getCurrentUserEmail() ?? "user@email.com";
     final profileFileName = userSessionService.getCurrentUserProfilePicture();
     final profileImageUrl =
         (profileFileName != null && profileFileName.isNotEmpty)
@@ -203,28 +215,51 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 Stack(
                                   alignment: Alignment.center,
                                   children: [
-                                    ClipOval(
-                                      child: (profileImageUrl != null)
-                                          ? Image.network(
-                                              profileImageUrl,
-                                              fit: BoxFit.cover,
-                                            )
-                                          : CircleAvatar(
-                                              radius: 70,
-                                              backgroundColor: Color(
-                                                0xFFCFE8F6,
-                                              ),
-                                              child: CircleAvatar(
-                                                radius: 52,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                child: Icon(
-                                                  Icons.person,
-                                                  size: 60,
-                                                  color: Colors.white,
+                                    SizedBox(
+                                      width: 140,
+                                      height: 140,
+                                      child: ClipOval(
+                                        child: (profileImageUrl != null)
+                                            ? Image.network(
+                                                profileImageUrl,
+                                                width: 140,
+                                                height: 140,
+                                                fit: BoxFit.cover,
+                                                errorBuilder:
+                                                    (
+                                                      context,
+                                                      error,
+                                                      stackTrace,
+                                                    ) => Container(
+                                                      color: const Color(
+                                                        0xFFCFE8F6,
+                                                      ),
+                                                      child: const Center(
+                                                        child: Icon(
+                                                          Icons.person,
+                                                          size: 60,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                              )
+                                            : CircleAvatar(
+                                                radius: 70,
+                                                backgroundColor: const Color(
+                                                  0xFFCFE8F6,
+                                                ),
+                                                child: const CircleAvatar(
+                                                  radius: 52,
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  child: Icon(
+                                                    Icons.person,
+                                                    size: 60,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
+                                      ),
                                     ),
                                     Positioned(
                                       right: 6,
@@ -268,13 +303,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     padding: const EdgeInsets.fromLTRB(18, 0, 18, 24),
                     child: Column(
                       children: [
-                        Text(userName, style: TextStyle(color: Colors.black)),
+                        Text(
+                          userName,
+                          style: TextStyle(
+                            fontFamily: "Poppins SemiBold",
+                            fontSize: 20,
+                            color: Colors.black,
+                          ),
+                        ),
                         const SizedBox(height: 6),
                         Text(
-                          "rashmibsnt@25 | +977 9865764534",
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.black87,
-                          ),
+                          '$userEmail | +977-9821233442',
+                          style: TextStyle(fontFamily: "Poppins Light"),
                         ),
 
                         const SizedBox(height: 22),

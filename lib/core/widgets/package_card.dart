@@ -7,10 +7,7 @@ class PackageCard extends StatelessWidget {
   final String imagePath;
   final String title;
 
-  const PackageCard({
-    required this.imagePath,
-    required this.title,
-  });
+  const PackageCard({required this.imagePath, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -76,10 +73,7 @@ class PackageCard extends StatelessWidget {
                 ),
                 child: const Text(
                   "View Details",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontFamily: "Poppins Medium"
-                  ),
+                  style: TextStyle(fontSize: 14, fontFamily: "Poppins Medium"),
                 ),
               ),
             ),

@@ -31,9 +31,25 @@ class UserRemoteDatasource implements IUserRemoteDatabase {
        _tokenService = tokenService;
 
   @override
-  Future<UserApiModel?> getCurrentUser() {
-    // TODO: implement getCurrentUser
-    throw UnimplementedError();
+  Future<UserApiModel?> getCurrentUser() async {
+    final token = _tokenService.getToken();
+    final response = await _apiClient.get(
+      ApiEndpoints.userProfile,
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+    if (response.data["success"] == true) {
+      final user = UserApiModel.fromJson(response.data["data"]);
+
+      await _userSessionService.saveUserSession(
+        userId: user.userId!,
+        email: user.email,
+        fullName: user.fullName,
+        profilePicture: user.profilePicture,
+      );
+
+      return user;
+    }
+    return null;
   }
 
   @override
@@ -58,6 +74,9 @@ class UserRemoteDatasource implements IUserRemoteDatabase {
         fullName: user.fullName,
         profilePicture: user.profilePicture,
       );
+
+      final token = response.data['token'] as String?;
+      await _tokenService.saveToken(token!);
 
       return user;
     }
@@ -88,10 +107,7 @@ class UserRemoteDatasource implements IUserRemoteDatabase {
   Future<String?> uploadProfilePicture(File image) async {
     final fileName = image.path.split("/").last;
     final formData = FormData.fromMap({
-      "profilePicture": await MultipartFile.fromFile(
-        image.path,
-        filename: fileName,
-      ),
+      "profile": await MultipartFile.fromFile(image.path, filename: fileName),
     });
 
     final token = _tokenService.getToken();
