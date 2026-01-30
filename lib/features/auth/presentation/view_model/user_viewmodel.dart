@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:venue_connect/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:venue_connect/features/auth/domain/usecases/login_usecase.dart';
 import 'package:venue_connect/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:venue_connect/features/auth/domain/usecases/register_usecase.dart';
+import 'package:venue_connect/features/auth/domain/usecases/upload_profile_picture_usecase.dart';
 import 'package:venue_connect/features/auth/presentation/state/user_state.dart';
 
 final userViewmodelProvider = NotifierProvider<UserViewmodel, UserState>(
@@ -12,12 +16,18 @@ class UserViewmodel extends Notifier<UserState> {
   late final RegisterUsecase _registerUsecase;
   late final LoginUsecase _loginUsecase;
   late final LogoutUsecase _logoutUsecase;
+  late final GetCurrentUserUsecase _getCurrentUserUsecase;
+  late final UploadProfilePictureUsecase _uploadProfilePictureUsecase;
 
   @override
   UserState build() {
     _registerUsecase = ref.read(registerUsecaseProvider);
     _loginUsecase = ref.read(loginUsecaseProvider);
     _logoutUsecase = ref.read(logoutUsecaseProvider);
+    _getCurrentUserUsecase = ref.read(getCurrentUserUsecaseProvider);
+    _uploadProfilePictureUsecase = ref.read(
+      uploadProfilePictureUsecaseProvider,
+    );
     return UserState();
   }
 
@@ -89,6 +99,46 @@ class UserViewmodel extends Notifier<UserState> {
         status: UserStatus.unauthenticated,
         userEntity: null,
       ),
+    );
+  }
+
+  // Upload Profile Picture
+  Future<void> uploadProfilePicture(File image) async {
+    state = state.copyWith(status: UserStatus.loading);
+    final result = await _uploadProfilePictureUsecase(
+      UploadProfilePictureParams(image: image),
+    );
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          status: UserStatus.error,
+          errorMessage: failure.message,
+        );
+      },
+      (imageName) {
+        state = state.copyWith(
+          status: UserStatus.loaded,
+          profilePictureName: imageName,
+        );
+      },
+    );
+  }
+
+  // Get Current User
+  Future<void> getCurrentUser() async {
+    state = state.copyWith(status: UserStatus.loading);
+    final result = await _getCurrentUserUsecase();
+
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          status: UserStatus.error,
+          errorMessage: failure.message,
+        );
+      },
+      (entity) {
+        state = state.copyWith(status: UserStatus.loaded, userEntity: entity);
+      },
     );
   }
 }
