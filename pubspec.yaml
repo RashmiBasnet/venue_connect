@@ -2,7 +2,7 @@ name: venue_connect
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -38,6 +38,7 @@ dependencies:
   # Permissions
   equatable: ^2.0.7
   dartz: ^0.10.1
+  permission_handler: ^12.0.1
 
   # Local Database (Offline Storage)
   hive: ^2.2.3
@@ -52,6 +53,7 @@ dependencies:
   connectivity_plus: ^7.0.0
 
   # Utilities
+  json_annotation: ^4.9.0
   uuid: ^4.5.2
 
   # Authentication
@@ -61,6 +63,9 @@ dependencies:
   # State Management
   flutter_riverpod: ^3.1.0
   riverpod_annotation: ^4.0.0
+
+  # Media Handling
+  image_picker: ^1.2.1
 
 dev_dependencies:
   flutter_test:
@@ -85,7 +90,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
