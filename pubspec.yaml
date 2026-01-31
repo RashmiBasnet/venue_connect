@@ -66,6 +66,7 @@ dependencies:
 
   # Media Handling
   image_picker: ^1.2.1
+  test_cov_console: ^0.2.2
 
 dev_dependencies:
   flutter_test:
