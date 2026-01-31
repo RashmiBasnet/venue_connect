@@ -9,209 +9,205 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Stack(
-          children: [
-
-            // Top right (leaf decoration)
-            Positioned(
-              top: -135,
-              right: -210,
-              child: Transform.rotate(
-                angle: -0.05,
-                child: Image.asset(
-                  'assets/images/image-2.png', 
-                  width: 580,
-                  height: 580,
-                  fit: BoxFit.cover,
-                ),
+      child: Stack(
+        children: [
+          // Top right (leaf decoration)
+          Positioned(
+            top: -135,
+            right: -210,
+            child: Transform.rotate(
+              angle: -0.05,
+              child: Image.asset(
+                'assets/images/image-2.png',
+                width: 580,
+                height: 580,
+                fit: BoxFit.cover,
               ),
             ),
+          ),
 
-            // Whole Content
-            SingleChildScrollView(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // LOGO
-                    Row(
-                      children: [
-                        Image.asset(
-                          'assets/images/logo_blue.png',
-                          width: 110,
-                          height: 110,
-                          fit: BoxFit.contain,
+          // Whole Content
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // LOGO
+                  Row(
+                    children: [
+                      Image.asset(
+                        'assets/images/logo_blue.png',
+                        width: 110,
+                        height: 110,
+                        fit: BoxFit.contain,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Greeting
+                  const Text(
+                    "Hi, Rashmi",
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 28,
+                      fontWeight: FontWeight.w600,
+                      color: kPrimaryDark,
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Search bar
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.search, color: Colors.grey),
+                        SizedBox(width: 8),
+                        Text(
+                          "Search",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
+                  ),
 
-                    const SizedBox(height: 12),
+                  const SizedBox(height: 24),
 
-                    // Greeting
-                    const Text(
-                      "Hi, Rashmi",
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 28,
-                        fontWeight: FontWeight.w600,
-                        color: kPrimaryDark,
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Search bar
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      height: 52,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: Colors.grey
+                  // Main Area(Packages + Venues)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black45,
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                      ),
-                      child: Row(
-                        children: const [
-                          Icon(Icons.search, color: Colors.grey),
-                          SizedBox(width: 8),
-                          Text(
-                            "Search",
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 14,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
+                      ],
                     ),
-
-                    const SizedBox(height: 24),
-
-                    // Main Area(Packages + Venues)
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black45,
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Packages header
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: const [
-                                Text(
-                                  "Packages",
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: kPrimaryDark,
-                                  ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Packages header
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: const [
+                              Text(
+                                "Packages",
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: kPrimaryDark,
                                 ),
-                                Text(
-                                  "See All",
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            // Packages(horizontal list)
-                            SizedBox(
-                              height: 300,
-                              child: ListView(
-                                scrollDirection: Axis.horizontal,
-                                children: const [
-                                  PackageCard(
-                                    imagePath: 'assets/images/birthday.png',
-                                    title: 'Birthday\nPackage',
-                                  ),
-                                  SizedBox(width: 12),
-                                  PackageCard(
-                                    imagePath: 'assets/images/outdoor.png',
-                                    title: 'Outdoor Party\nPackage',
-                                  ),
-                                ],
                               ),
-                            ),
+                              Text(
+                                "See All",
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
 
-                            // Dot indicator
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _dot(true),
-                                const SizedBox(width: 4),
-                                _dot(false),
-                                const SizedBox(width: 4),
-                                _dot(false),
-                              ],
-                            ),
+                          const SizedBox(height: 12),
 
-                            const SizedBox(height: 20),
-
-                            // Venues header
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          // Packages(horizontal list)
+                          SizedBox(
+                            height: 300,
+                            child: ListView(
+                              scrollDirection: Axis.horizontal,
                               children: const [
-                                Text(
-                                  "Venues",
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: kPrimaryDark,
-                                  ),
+                                PackageCard(
+                                  imagePath: 'assets/images/birthday.png',
+                                  title: 'Birthday\nPackage',
                                 ),
-                                Text(
-                                  "See All",
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
+                                SizedBox(width: 12),
+                                PackageCard(
+                                  imagePath: 'assets/images/outdoor.png',
+                                  title: 'Outdoor Party\nPackage',
                                 ),
                               ],
                             ),
+                          ),
 
-                            const SizedBox(height: 12),
+                          // Dot indicator
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _dot(true),
+                              const SizedBox(width: 4),
+                              _dot(false),
+                              const SizedBox(width: 4),
+                              _dot(false),
+                            ],
+                          ),
 
-                            // Venue card
-                            const VenueCard(
-                              imagePath: 'assets/images/lord_palace.png',
-                              name: 'Lord Palace Banquet',
-                              address: 'P8VC+7WJ, Tokha Rd,\nKathmandu',
-                            ),
-                          ],
-                        ),
+                          const SizedBox(height: 20),
+
+                          // Venues header
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: const [
+                              Text(
+                                "Venues",
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: kPrimaryDark,
+                                ),
+                              ),
+                              Text(
+                                "See All",
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          // Venue card
+                          const VenueCard(
+                            imagePath: 'assets/images/lord_palace.png',
+                            name: 'Lord Palace Banquet',
+                            address: 'P8VC+7WJ, Tokha Rd,\nKathmandu',
+                          ),
+                        ],
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 16),
-                  ],
-                ),
+                  const SizedBox(height: 16),
+                ],
               ),
             ),
-          ],
-        )
+          ),
+        ],
+      ),
     );
   }
 
