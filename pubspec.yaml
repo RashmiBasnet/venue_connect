@@ -84,6 +84,7 @@ dev_dependencies:
   # Testing
   mocktail: ^1.0.3
   fake_async: ^1.3.1
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -144,3 +145,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: "AppIcon"
+  image_path: "assets/images/logo_blue.png"
+  min_sdk_android: 21
+  remove_alphaa_ios: true
