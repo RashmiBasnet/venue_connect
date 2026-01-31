@@ -65,10 +65,7 @@ class VenueCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
               address,
-              style: const TextStyle(
-                fontSize: 13,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 13, color: Colors.grey),
             ),
           ),
 
@@ -79,8 +76,7 @@ class VenueCard extends StatelessWidget {
             child: Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton(
-                onPressed: () {
-                },
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: kAccentGold,
                   shape: RoundedRectangleBorder(
@@ -93,10 +89,7 @@ class VenueCard extends StatelessWidget {
                 ),
                 child: const Text(
                   "Reserve",
-                  style: TextStyle(
-                    fontFamily: "Poppins Medium",
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(fontFamily: "Poppins Medium", fontSize: 14),
                 ),
               ),
             ),

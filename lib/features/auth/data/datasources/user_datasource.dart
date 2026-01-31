@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:venue_connect/features/auth/data/models/user_api_model.dart';
 import 'package:venue_connect/features/auth/data/models/user_hive_model.dart';
 
@@ -19,4 +21,6 @@ abstract interface class IUserRemoteDatabase {
 
   // get Email exists
   Future<bool> isEmailExists(String email);
+
+  Future<String?> uploadProfilePicture(File image);
 }

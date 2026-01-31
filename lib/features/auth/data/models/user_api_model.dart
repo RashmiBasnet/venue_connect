@@ -1,11 +1,17 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:venue_connect/features/auth/domain/entities/user_entity.dart';
 
+part 'user_api_model.g.dart';
+
+@JsonSerializable()
 class UserApiModel {
+  @JsonKey(name: "_id")
   final String? userId;
   final String fullName;
   final String email;
   final String? password;
   final String? confirmPassword;
+  final String? profilePicture;
 
   UserApiModel({
     this.userId,
@@ -13,29 +19,15 @@ class UserApiModel {
     required this.email,
     this.password,
     this.confirmPassword,
+    this.profilePicture,
   });
 
   // To JSON
-  Map<String, dynamic> toJson() {
-    return {
-      "userId": userId,
-      "fullName": fullName,
-      "email": email,
-      "password": password,
-      "confirmPassword": confirmPassword,
-    };
-  }
+  Map<String, dynamic> toJson() => _$UserApiModelToJson(this);
 
   // fromJson
-  factory UserApiModel.fromJson(Map<String, dynamic> json) {
-    return UserApiModel(
-      userId: json['_id'] as String?,
-      fullName: json['fullName'] as String,
-      email: json['email'] as String,
-      password: json['password'] as String?,
-      confirmPassword: json['confirmPassword'] as String?,
-    );
-  }
+  factory UserApiModel.fromJson(Map<String, dynamic> json) =>
+      _$UserApiModelFromJson(json);
 
   // toEntity
   UserEntity toEntity() {

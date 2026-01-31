@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,9 +34,31 @@ class UserRepository implements IUserRepository {
        _networkInfo = networkInfo;
 
   @override
-  Future<Either<Failure, UserEntity>> getCurrentUser() {
-    // TODO: implement getCurrentUser
-    throw UnimplementedError();
+  Future<Either<Failure, UserEntity>> getCurrentUser() async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final apiModel = await _userRemoteDatabase.getCurrentUser();
+        if (apiModel != null) {
+          final entity = apiModel.toEntity();
+          return Right(entity);
+        }
+        return Left(ApiFailure(message: "User Not Found"));
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data?["message"] ??
+                e.message ??
+                "Failed to fetch user",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return Left(ApiFailure(message: "No InternetConnect"));
+    }
   }
 
   @override
@@ -125,6 +149,28 @@ class UserRepository implements IUserRepository {
       } catch (e) {
         return Left(LocalDatabaseFailure(message: e.toString()));
       }
+    }
+  }
+
+  @override
+  Future<Either<Failure, String?>> uploadProfilePicture(File image) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final fileName = await _userRemoteDatabase.uploadProfilePicture(image);
+        return Right(fileName);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data?["message"] ?? e.message ?? "Upload Failed",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return Left(ApiFailure(message: "No Internet Connection"));
     }
   }
 }
