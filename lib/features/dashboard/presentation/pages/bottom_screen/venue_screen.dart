@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:venue_connect/app/app.dart';
 import 'package:venue_connect/core/api/api_endpoints.dart';
+import 'package:venue_connect/features/venue/presentation/pages/venue_detail_screen.dart';
 import 'package:venue_connect/features/venue/domain/entities/venue_entity.dart';
 import 'package:venue_connect/features/venue/presentation/state/venue_state.dart';
 import 'package:venue_connect/features/venue/presentation/view_model/venue_viewmodel.dart';
@@ -122,7 +123,23 @@ class _VenueScreenState extends ConsumerState<VenueScreen> {
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         final venue = state.venues[index];
-        return _VenueListCard(venue: venue);
+        return _VenueListCard(
+          venue: venue,
+          onDetailsTap: () {
+            if (venue.venueId == null || venue.venueId!.trim().isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Venue ID is missing')),
+              );
+              return;
+            }
+
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => VenueDetailScreen(venueId: venue.venueId!),
+              ),
+            );
+          },
+        );
       },
     );
   }
@@ -130,8 +147,9 @@ class _VenueScreenState extends ConsumerState<VenueScreen> {
 
 class _VenueListCard extends StatelessWidget {
   final VenueEntity venue;
+  final VoidCallback onDetailsTap;
 
-  const _VenueListCard({required this.venue});
+  const _VenueListCard({required this.venue, required this.onDetailsTap});
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +241,7 @@ class _VenueListCard extends StatelessWidget {
                 SizedBox(
                   height: 39,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: onDetailsTap,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFB58460),
                       foregroundColor: Colors.white,
