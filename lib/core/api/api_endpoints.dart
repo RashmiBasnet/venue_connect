@@ -37,6 +37,12 @@ class ApiEndpoints {
 
   static String venueById(String venueId) => '$venues/$venueId';
 
+  // =================== Package Endpoints ===================
+  static const String packages = '/packages';
+
+  static String packageById(String packageId) => '$packages/$packageId';
+  static String packagesByVenueId(String venueId) => '$packages/venue/$venueId';
+
   static String profilePicture(String filename) =>
       '$mediaServerUrl/uploads/$filename';
 
