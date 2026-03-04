@@ -32,6 +32,14 @@ class ApiEndpoints {
   static const String uploadProfilePicture = '/user/profile/upload';
   static const String updateUserProfile = '/user/update-profile';
 
+  // =================== Venue Endpoints ===================
+  static const String venues = '/venues';
+
+  static String venueById(String venueId) => '$venues/$venueId';
+
   static String profilePicture(String filename) =>
+      '$mediaServerUrl/uploads/$filename';
+
+  static String venueImage(String filename) =>
       '$mediaServerUrl/uploads/$filename';
 }
