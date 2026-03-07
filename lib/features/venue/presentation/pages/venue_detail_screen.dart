@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:venue_connect/core/api/api_endpoints.dart';
+import 'package:venue_connect/features/booking/presentation/pages/create_booking_screen.dart';
 import 'package:venue_connect/features/venue/domain/entities/venue_entity.dart';
 import 'package:venue_connect/features/venue/domain/usecases/get_venue_by_id_usecase.dart';
 
@@ -220,6 +221,34 @@ class _VenueDetailScreenState extends ConsumerState<VenueDetailScreen> {
                         .map((item) => _AmenityChip(label: item))
                         .toList(),
                   ),
+                const SizedBox(height: 22),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => CreateBookingScreen(venue: venue),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF233041),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Book Now',
+                      style: TextStyle(
+                        fontFamily: 'Poppins SemiBold',
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
