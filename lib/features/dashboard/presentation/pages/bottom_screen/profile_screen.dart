@@ -163,8 +163,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ? ApiEndpoints.profilePicture(profileFileName)
         : null;
 
-    final theme = Theme.of(context);
-
     return Scaffold(
       backgroundColor: const Color(0xFFF7F7F7),
       body: SafeArea(
