@@ -2,18 +2,18 @@ import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:venue_connect/core/api/api_endpoints.dart';
+import 'package:venue_connect/core/services/storage/token_service.dart';
 
 final apiClientProvider = Provider<ApiClient>((ref) {
-  return ApiClient();
+  return ApiClient(tokenService: ref.read(tokenServiceProvider));
 });
 
 class ApiClient {
   late final Dio _dio;
 
-  ApiClient() {
+  ApiClient({required TokenService tokenService}) {
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiEndpoints.baseUrl,
@@ -27,7 +27,7 @@ class ApiClient {
     );
 
     // Add interceptors
-    _dio.interceptors.add(_AuthInterceptor());
+    _dio.interceptors.add(_AuthInterceptor(tokenService: tokenService));
 
     // Auto retry on network failures
     _dio.interceptors.add(
@@ -151,8 +151,10 @@ class ApiClient {
 
 // Auth Interceptor to add JWT token to requests
 class _AuthInterceptor extends Interceptor {
-  final _storage = const FlutterSecureStorage();
-  static const String _tokenKey = 'auth_token';
+  final TokenService _tokenService;
+
+  _AuthInterceptor({required TokenService tokenService})
+    : _tokenService = tokenService;
 
   @override
   void onRequest(
@@ -162,8 +164,8 @@ class _AuthInterceptor extends Interceptor {
     final isAuthEndpoint = options.path == ApiEndpoints.userLogin;
 
     if (!isAuthEndpoint) {
-      final token = await _storage.read(key: _tokenKey);
-      if (token != null) {
+      final token = _tokenService.getToken();
+      if (token != null && token.trim().isNotEmpty) {
         options.headers['Authorization'] = 'Bearer $token';
       }
     }
@@ -176,7 +178,7 @@ class _AuthInterceptor extends Interceptor {
     // Handle 401 Unauthorized - token expired
     if (err.response?.statusCode == 401) {
       // Clear token and redirect to login
-      _storage.delete(key: _tokenKey);
+      _tokenService.removeToken();
       // You can add navigation logic here or use a callback
     }
     handler.next(err);
