@@ -3,27 +3,34 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:venue_connect/core/error/failures.dart';
 import 'package:venue_connect/core/services/connectivity/network_info.dart';
+import 'package:venue_connect/features/venue/data/datasources/local/venue_local_datasource.dart';
 import 'package:venue_connect/features/venue/data/datasources/remote/venue_remote_datasource.dart';
 import 'package:venue_connect/features/venue/data/datasources/venue_datasource.dart';
-import 'package:venue_connect/features/venue/data/models/venue_api_model.dart';
+import 'package:venue_connect/features/venue/data/models/venue_hive_model.dart';
 import 'package:venue_connect/features/venue/domain/entities/venue_entity.dart';
 import 'package:venue_connect/features/venue/domain/repositories/venue_repository.dart';
 
 final venueRepositoryProvider = Provider<VenueRepository>((ref) {
   return VenueRepository(
+    venueLocalDatasource: ref.read(venueLocalDatasourceProvider),
     venueRemoteDatasource: ref.read(venueRemoteDatasourceProvider),
     networkInfo: ref.read(networkInfoProvider),
   );
 });
 
 class VenueRepository implements IVenueRepository {
+  static const int _venueCacheLimit = 5;
+
+  final IVenueLocalDatasource _venueLocalDatasource;
   final IVenueRemoteDatasource _venueRemoteDatasource;
   final NetworkInfo _networkInfo;
 
   VenueRepository({
+    required IVenueLocalDatasource venueLocalDatasource,
     required IVenueRemoteDatasource venueRemoteDatasource,
     required NetworkInfo networkInfo,
-  }) : _venueRemoteDatasource = venueRemoteDatasource,
+  }) : _venueLocalDatasource = venueLocalDatasource,
+       _venueRemoteDatasource = venueRemoteDatasource,
        _networkInfo = networkInfo;
 
   @override
@@ -31,7 +38,14 @@ class VenueRepository implements IVenueRepository {
     if (await _networkInfo.isConnected) {
       try {
         final apiModels = await _venueRemoteDatasource.getAllVenues();
-        final entities = VenueApiModel.toEntityList(apiModels);
+        final entities = apiModels.map((model) => model.toEntity()).toList();
+        final hiveModels = VenueHiveModel.fromApiModelList(apiModels);
+
+        await _venueLocalDatasource.cacheVenues(
+          hiveModels,
+          amount: _venueCacheLimit,
+        );
+
         return Right(entities);
       } on DioException catch (e) {
         return Left(
@@ -47,7 +61,15 @@ class VenueRepository implements IVenueRepository {
         return Left(ApiFailure(message: e.toString()));
       }
     } else {
-      return Left(ApiFailure(message: 'No Internet Connection'));
+      final cachedVenues = await _venueLocalDatasource.getAllVenues();
+      if (cachedVenues.isNotEmpty) {
+        final entities = cachedVenues.map((model) => model.toEntity()).toList();
+        return Right(entities);
+      }
+
+      return Left(
+        ApiFailure(message: 'No Internet Connection and no cached data'),
+      );
     }
   }
 
@@ -75,7 +97,14 @@ class VenueRepository implements IVenueRepository {
         return Left(ApiFailure(message: e.toString()));
       }
     } else {
-      return Left(ApiFailure(message: 'No Internet Connection'));
+      final cachedVenue = await _venueLocalDatasource.getVenueById(venueId);
+      if (cachedVenue != null) {
+        return Right(cachedVenue.toEntity());
+      }
+
+      return Left(
+        ApiFailure(message: 'No Internet Connection and no cached data'),
+      );
     }
   }
 }
