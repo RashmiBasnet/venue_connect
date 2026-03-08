@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:venue_connect/app/app.dart';
+import 'package:venue_connect/app/routes/app_routes.dart';
 import 'package:venue_connect/core/api/api_endpoints.dart';
+import 'package:venue_connect/core/services/sensors/shake_service.dart';
 import 'package:venue_connect/core/services/storage/user_session_storage.dart';
+import 'package:venue_connect/features/auth/presentation/pages/login_screen.dart';
+import 'package:venue_connect/features/auth/presentation/view_model/user_viewmodel.dart';
 import 'package:venue_connect/features/package/domain/entities/package_entity.dart';
 import 'package:venue_connect/features/package/presentation/state/package_state.dart';
 import 'package:venue_connect/features/package/presentation/view_model/package_viewmodel.dart';
@@ -18,15 +22,68 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  late final ShakeService _shakeService;
+  DateTime _lastShakeTime = DateTime.fromMillisecondsSinceEpoch(0);
+  bool _isLogoutDialogOpen = false;
+  static const Duration _shakeCooldown = Duration(seconds: 2);
+
   @override
   void initState() {
     super.initState();
+    _shakeService = ref.read(shakeServiceProvider);
+    _startShakeListener();
     Future.microtask(() async {
       await ref.read(venueViewmodelProvider.notifier).getAllVenues();
       await ref
           .read(packageViewmodelProvider.notifier)
           .getAllPackages(page: 1, size: 4);
     });
+  }
+
+  @override
+  void dispose() {
+    _shakeService.stopListening();
+    super.dispose();
+  }
+
+  void _startShakeListener() {
+    _shakeService.startListening(
+      onShake: () {
+        final now = DateTime.now();
+        if (now.difference(_lastShakeTime) < _shakeCooldown) return;
+        if (_isLogoutDialogOpen || !mounted) return;
+        _lastShakeTime = now;
+        _showShakeLogoutDialog();
+      },
+    );
+  }
+
+  Future<void> _showShakeLogoutDialog() async {
+    _isLogoutDialogOpen = true;
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Shake detected. Do you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+    _isLogoutDialogOpen = false;
+
+    if (shouldLogout != true || !mounted) return;
+
+    await ref.read(userViewmodelProvider.notifier).logout();
+    if (!mounted) return;
+    AppRoutes.pushAndRemoveUntil(context, const LoginScreen());
   }
 
   @override
