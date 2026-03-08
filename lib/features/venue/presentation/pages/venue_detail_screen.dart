@@ -150,30 +150,30 @@ class _VenueDetailScreenState extends ConsumerState<VenueDetailScreen> {
                 Text(
                   venue.name,
                   style: const TextStyle(
-                    fontFamily: 'Poppins Bold',
-                    fontSize: 26,
+                    fontFamily: 'Poppins SemiBold',
+                    fontSize: 20,
                     color: Color(0xFF233041),
                   ),
                 ),
                 const SizedBox(height: 10),
                 _InfoTile(title: 'Address', value: _addressText(venue)),
-                const SizedBox(height: 10),
+                const SizedBox(height: 7),
                 _InfoTile(
                   title: 'Price Per Plate',
                   value: 'NPR ${venue.pricePerPlate.toStringAsFixed(0)}',
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 7),
                 _InfoTile(
                   title: 'Capacity',
                   value:
                       '${venue.capacity.minGuests}-${venue.capacity.maxGuests} guests',
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 7),
                 _InfoTile(
                   title: 'Status',
                   value: venue.isActive ? 'Active' : 'Inactive',
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 7),
                 const Text(
                   'Description',
                   style: TextStyle(

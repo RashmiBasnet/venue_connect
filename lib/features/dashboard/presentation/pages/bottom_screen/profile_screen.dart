@@ -327,20 +327,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               title: "Edit profile information",
                               onTap: () {},
                             ),
-                            _SettingsTile(
-                              icon: Icons.notifications_none,
-                              title: "Notifications",
-                              trailingText: "ON",
-                              trailingTextColor: const Color(0xFFB07C5E),
-                              onTap: () {},
-                            ),
-                            _SettingsTile(
-                              icon: Icons.translate,
-                              title: "Language",
-                              trailingText: "English",
-                              trailingTextColor: const Color(0xFFB07C5E),
-                              onTap: () {},
-                            ),
                           ],
                         ),
 
@@ -348,11 +334,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
                         _SettingsCard(
                           children: [
-                            _SettingsTile(
-                              icon: Icons.security,
-                              title: "Security",
-                              onTap: () {},
-                            ),
                             _SettingsSwitchTile(
                               icon: Icons.fingerprint,
                               title: "Enable biometric login",
@@ -375,13 +356,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   );
                                 }
                               },
-                            ),
-                            _SettingsTile(
-                              icon: Icons.palette_outlined,
-                              title: "Theme",
-                              trailingText: "Light mode",
-                              trailingTextColor: const Color(0xFFB07C5E),
-                              onTap: () {},
                             ),
                           ],
                         ),
@@ -411,7 +385,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         const SizedBox(height: 26),
 
                         SizedBox(
-                          width: 180,
+                          width: 100,
                           height: 52,
                           child: ElevatedButton(
                             onPressed: () => _showLogoutDialog(context),
@@ -425,7 +399,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             child: const Text(
                               "Logout",
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 17,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
                               ),

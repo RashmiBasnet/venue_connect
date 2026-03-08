@@ -81,11 +81,13 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
       _isPaying = true;
     });
 
-    await ref.read(paymentViewmodelProvider.notifier).initiateKhaltiPayment(
-      bookingId: bookingId,
-      amount: booking.totalPrice.round(),
-      returnUrl: 'https://example.com/khalti-return',
-    );
+    await ref
+        .read(paymentViewmodelProvider.notifier)
+        .initiateKhaltiPayment(
+          bookingId: bookingId,
+          amount: booking.totalPrice.round(),
+          returnUrl: 'https://example.com/khalti-return',
+        );
 
     if (!mounted) return;
 
@@ -100,7 +102,9 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
     if (paymentState.status == PaymentStateStatus.error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(paymentState.errorMessage ?? 'Failed to initiate payment'),
+          content: Text(
+            paymentState.errorMessage ?? 'Failed to initiate payment',
+          ),
         ),
       );
       return;
@@ -159,9 +163,9 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
       });
     }
 
-    await ref.read(paymentViewmodelProvider.notifier).getPaymentByBookingId(
-      bookingId,
-    );
+    await ref
+        .read(paymentViewmodelProvider.notifier)
+        .getPaymentByBookingId(bookingId);
 
     if (!mounted) return;
 
@@ -186,10 +190,12 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
 
     if (payment.status == PaymentRecordStatus.pending &&
         (payment.pidx ?? '').trim().isNotEmpty) {
-      await ref.read(paymentViewmodelProvider.notifier).verifyKhaltiPayment(
-        bookingId: bookingId,
-        pidx: payment.pidx!.trim(),
-      );
+      await ref
+          .read(paymentViewmodelProvider.notifier)
+          .verifyKhaltiPayment(
+            bookingId: bookingId,
+            pidx: payment.pidx!.trim(),
+          );
       if (!mounted) return;
       paymentState = ref.read(paymentViewmodelProvider);
     }
@@ -219,9 +225,9 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
     _paymentFlowStarted = false;
 
     if (showFeedback) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Payment status updated')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Payment status updated')));
     }
   }
 
@@ -386,7 +392,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
                     color: Color(0xFF475569),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -446,7 +452,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
                                         venue?.name ?? 'Venue',
                                         style: const TextStyle(
                                           fontFamily: 'Poppins SemiBold',
-                                          fontSize: 30,
+                                          fontSize: 20,
                                           color: Color(0xFF0F172A),
                                           height: 1,
                                         ),
@@ -456,7 +462,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
                                         _addressLine(booking),
                                         style: const TextStyle(
                                           fontFamily: 'Poppins Regular',
-                                          fontSize: 12,
+                                          fontSize: 11,
                                           color: Color(0xFF64748B),
                                         ),
                                       ),
@@ -469,7 +475,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
                                 _PaymentBadge(status: booking.paymentStatus),
                               ],
                             ),
-                            const SizedBox(height: 14),
+                            const SizedBox(height: 10),
                             Row(
                               children: [
                                 Expanded(
@@ -478,7 +484,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
                                     _formatDate(booking.eventDate),
                                   ),
                                 ),
-                                const SizedBox(width: 10),
+                                const SizedBox(width: 7),
                                 Expanded(
                                   child: _detailBox(
                                     'Time',
@@ -505,7 +511,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 7),
                             Row(
                               children: [
                                 Expanded(
@@ -643,7 +649,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
             label,
             style: const TextStyle(
               fontFamily: 'Poppins Regular',
-              fontSize: 13,
+              fontSize: 10,
               color: Color(0xFF64748B),
             ),
           ),
@@ -652,7 +658,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
             value,
             style: const TextStyle(
               fontFamily: 'Poppins SemiBold',
-              fontSize: 20,
+              fontSize: 15,
               color: Color(0xFF0F172A),
             ),
           ),
