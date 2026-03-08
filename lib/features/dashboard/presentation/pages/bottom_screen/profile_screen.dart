@@ -8,6 +8,7 @@ import 'package:venue_connect/app/routes/app_routes.dart';
 import 'package:venue_connect/core/api/api_endpoints.dart';
 import 'package:venue_connect/core/services/storage/user_session_storage.dart';
 import 'package:venue_connect/core/utils/snackbar_utils.dart';
+import 'package:venue_connect/features/auth/presentation/pages/edit_profile_screen.dart';
 import 'package:venue_connect/features/auth/presentation/pages/login_screen.dart';
 import 'package:venue_connect/features/auth/presentation/state/user_state.dart';
 import 'package:venue_connect/features/auth/presentation/view_model/user_viewmodel.dart';
@@ -325,7 +326,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             _SettingsTile(
                               icon: Icons.edit_note,
                               title: "Edit profile information",
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const EditProfileScreen(),
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -486,22 +494,12 @@ class _SettingsCard extends StatelessWidget {
 class _SettingsTile extends StatelessWidget {
   final IconData icon;
   final String title;
-  final String? trailingText;
-  final Color? trailingTextColor;
   final VoidCallback? onTap;
 
-  const _SettingsTile({
-    required this.icon,
-    required this.title,
-    this.trailingText,
-    this.trailingTextColor,
-    this.onTap,
-  });
+  const _SettingsTile({required this.icon, required this.title, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final showTrailing = trailingText != null;
-
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -519,15 +517,6 @@ class _SettingsTile extends StatelessWidget {
                 ),
               ),
             ),
-            if (showTrailing)
-              Text(
-                trailingText!,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: trailingTextColor ?? Colors.black54,
-                ),
-              ),
           ],
         ),
       ),
