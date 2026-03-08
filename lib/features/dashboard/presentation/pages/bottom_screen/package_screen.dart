@@ -148,7 +148,7 @@ class _PackageSearchBar extends StatelessWidget {
               hintText: 'Search packages (name, description...)',
               hintStyle: const TextStyle(
                 fontFamily: 'Poppins Regular',
-                fontSize: 13,
+                fontSize: 12,
               ),
               isDense: true,
               filled: true,
@@ -375,8 +375,8 @@ class _PackageCard extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                              fontFamily: 'Poppins Bold',
-                              fontSize: 17,
+                              fontFamily: 'Poppins SemiBold',
+                              fontSize: 19,
                               color: Color(0xFF233041),
                             ),
                           ),

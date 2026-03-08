@@ -9,6 +9,7 @@ import 'package:venue_connect/core/api/api_endpoints.dart';
 import 'package:venue_connect/core/services/storage/user_session_storage.dart';
 import 'package:venue_connect/core/utils/snackbar_utils.dart';
 import 'package:venue_connect/features/auth/presentation/pages/login_screen.dart';
+import 'package:venue_connect/features/auth/presentation/state/user_state.dart';
 import 'package:venue_connect/features/auth/presentation/view_model/user_viewmodel.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -153,6 +154,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final userSessionService = ref.watch(userSessionServiceProvider);
+    final userState = ref.watch(userViewmodelProvider);
 
     final userName = userSessionService.getCurrentUserFullName() ?? "User";
     final userEmail =
@@ -351,6 +353,29 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               title: "Security",
                               onTap: () {},
                             ),
+                            _SettingsSwitchTile(
+                              icon: Icons.fingerprint,
+                              title: "Enable biometric login",
+                              value: userState.biometricEnabled,
+                              onChanged: (enabled) async {
+                                await ref
+                                    .read(userViewmodelProvider.notifier)
+                                    .setBiometricEnabled(enabled);
+
+                                if (!mounted) return;
+
+                                final updatedState = ref.read(
+                                  userViewmodelProvider,
+                                );
+                                if (updatedState.status == UserStatus.error &&
+                                    updatedState.errorMessage != null) {
+                                  SnackbarUtils.showError(
+                                    this.context,
+                                    updatedState.errorMessage!,
+                                  );
+                                }
+                              },
+                            ),
                             _SettingsTile(
                               icon: Icons.palette_outlined,
                               title: "Theme",
@@ -531,6 +556,44 @@ class _SettingsTile extends StatelessWidget {
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SettingsSwitchTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _SettingsSwitchTile({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 26, color: Colors.black),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+          ),
+          Switch(
+            value: value,
+            activeThumbColor: const Color(0xFFB07C5E),
+            onChanged: onChanged,
+          ),
+        ],
       ),
     );
   }

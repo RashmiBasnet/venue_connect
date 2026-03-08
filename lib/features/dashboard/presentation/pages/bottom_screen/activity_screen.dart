@@ -169,7 +169,7 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen>
               'Activity',
               style: TextStyle(
                 fontFamily: 'Poppins Bold',
-                fontSize: 34,
+                fontSize: 30,
                 color: Color(0xFF0F172A),
               ),
             ),
@@ -178,7 +178,7 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen>
               'Track your pending, upcoming, and past bookings.',
               style: TextStyle(
                 fontFamily: 'Poppins Regular',
-                fontSize: 13,
+                fontSize: 12,
                 color: Color(0xFF475569),
               ),
             ),
@@ -418,7 +418,7 @@ class _BookingCard extends StatelessWidget {
                   venue?.name ?? 'Venue',
                   style: const TextStyle(
                     fontFamily: 'Poppins SemiBold',
-                    fontSize: 30,
+                    fontSize: 19,
                     color: Color(0xFF0F172A),
                     height: 1,
                   ),
@@ -428,7 +428,7 @@ class _BookingCard extends StatelessWidget {
                   addressText,
                   style: const TextStyle(
                     fontFamily: 'Poppins Regular',
-                    fontSize: 12,
+                    fontSize: 11,
                     color: Color(0xFF64748B),
                   ),
                 ),

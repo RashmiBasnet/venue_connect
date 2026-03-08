@@ -49,27 +49,25 @@ class _VenueScreenState extends ConsumerState<VenueScreen> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 25),
-                const Text(
-                  'Venues',
-                  style: TextStyle(
-                    fontFamily: 'Poppins SemiBold',
-                    fontSize: 38,
-                    color: kPrimaryDark,
-                    height: 1,
+            child: RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  const SizedBox(height: 25),
+                  const Text(
+                    'Venues',
+                    style: TextStyle(
+                      fontFamily: 'Poppins Bold',
+                      fontSize: 30,
+                      color: kPrimaryDark,
+                      height: 1,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 44),
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: _onRefresh,
-                    child: _buildBody(state),
-                  ),
-                ),
-              ],
+                  const SizedBox(height: 44),
+                  _buildBody(state),
+                ],
+              ),
             ),
           ),
         ],
@@ -79,68 +77,69 @@ class _VenueScreenState extends ConsumerState<VenueScreen> {
 
   Widget _buildBody(VenueState state) {
     if (state.status == VenueStatus.loading && state.venues.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return const Padding(
+        padding: EdgeInsets.only(top: 80),
+        child: Center(child: CircularProgressIndicator()),
+      );
     }
 
     if (state.status == VenueStatus.error && state.venues.isEmpty) {
-      return ListView(
-        children: [
-          const SizedBox(height: 80),
-          Center(
-            child: Text(
-              state.errorMessage ?? 'Failed to load venues',
-              style: const TextStyle(
-                fontFamily: 'Poppins Medium',
-                color: Colors.black54,
-              ),
-              textAlign: TextAlign.center,
+      return Padding(
+        padding: const EdgeInsets.only(top: 80),
+        child: Center(
+          child: Text(
+            state.errorMessage ?? 'Failed to load venues',
+            style: const TextStyle(
+              fontFamily: 'Poppins Medium',
+              color: Colors.black54,
             ),
+            textAlign: TextAlign.center,
           ),
-        ],
+        ),
       );
     }
 
     if (state.venues.isEmpty) {
-      return ListView(
-        children: const [
-          SizedBox(height: 80),
-          Center(
-            child: Text(
-              'No venues available',
-              style: TextStyle(
-                fontFamily: 'Poppins Medium',
-                color: Colors.black54,
-              ),
+      return const Padding(
+        padding: EdgeInsets.only(top: 80),
+        child: Center(
+          child: Text(
+            'No venues available',
+            style: TextStyle(
+              fontFamily: 'Poppins Medium',
+              color: Colors.black54,
             ),
           ),
-        ],
+        ),
       );
     }
 
-    return ListView.separated(
-      physics: const AlwaysScrollableScrollPhysics(),
-      itemCount: state.venues.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 16),
-      itemBuilder: (context, index) {
-        final venue = state.venues[index];
-        return _VenueListCard(
-          venue: venue,
-          onDetailsTap: () {
-            if (venue.venueId == null || venue.venueId!.trim().isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Venue ID is missing')),
-              );
-              return;
-            }
+    return Column(
+      children: state.venues
+          .map(
+            (venue) => Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: _VenueListCard(
+                venue: venue,
+                onDetailsTap: () {
+                  if (venue.venueId == null || venue.venueId!.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Venue ID is missing')),
+                    );
+                    return;
+                  }
 
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => VenueDetailScreen(venueId: venue.venueId!),
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          VenueDetailScreen(venueId: venue.venueId!),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        );
-      },
+            ),
+          )
+          .toList(),
     );
   }
 }
@@ -217,7 +216,7 @@ class _VenueListCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontFamily: 'Poppins SemiBold',
-                          fontSize: 25,
+                          fontSize: 19,
                           color: Color(0xFF3A2D2D),
                           height: 0.95,
                         ),
@@ -229,7 +228,7 @@ class _VenueListCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontFamily: 'Poppins Regular',
-                          fontSize: 16,
+                          fontSize: 12,
                           color: Color(0xFF5F5B5B),
                           height: 1,
                         ),
@@ -255,7 +254,7 @@ class _VenueListCard extends StatelessWidget {
                       'Details',
                       style: TextStyle(
                         fontFamily: 'Poppins SemiBold',
-                        fontSize: 14,
+                        fontSize: 12,
                       ),
                     ),
                   ),
