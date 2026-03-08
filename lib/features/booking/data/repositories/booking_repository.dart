@@ -3,9 +3,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:venue_connect/core/error/failures.dart';
 import 'package:venue_connect/core/services/connectivity/network_info.dart';
+import 'package:venue_connect/features/booking/data/datasources/local/booking_local_datasource.dart';
 import 'package:venue_connect/features/booking/data/datasources/booking_datasource.dart';
 import 'package:venue_connect/features/booking/data/datasources/remote/booking_remote_datasource.dart';
 import 'package:venue_connect/features/booking/data/models/booking_api_model.dart';
+import 'package:venue_connect/features/booking/data/models/booking_hive_model.dart';
 import 'package:venue_connect/features/booking/data/models/create_booking_api_model.dart';
 import 'package:venue_connect/features/booking/domain/entities/booking_entity.dart';
 import 'package:venue_connect/features/booking/domain/entities/create_booking_entity.dart';
@@ -13,19 +15,25 @@ import 'package:venue_connect/features/booking/domain/repositories/booking_repos
 
 final bookingRepositoryProvider = Provider<BookingRepository>((ref) {
   return BookingRepository(
+    bookingLocalDatasource: ref.read(bookingLocalDatasourceProvider),
     bookingRemoteDatasource: ref.read(bookingRemoteDatasourceProvider),
     networkInfo: ref.read(networkInfoProvider),
   );
 });
 
 class BookingRepository implements IBookingRepository {
+  static const int _bookingCacheLimit = 30;
+
+  final IBookingLocalDatasource _bookingLocalDatasource;
   final IBookingRemoteDatasource _bookingRemoteDatasource;
   final NetworkInfo _networkInfo;
 
   BookingRepository({
+    required IBookingLocalDatasource bookingLocalDatasource,
     required IBookingRemoteDatasource bookingRemoteDatasource,
     required NetworkInfo networkInfo,
-  }) : _bookingRemoteDatasource = bookingRemoteDatasource,
+  }) : _bookingLocalDatasource = bookingLocalDatasource,
+       _bookingRemoteDatasource = bookingRemoteDatasource,
        _networkInfo = networkInfo;
 
   String _extractDioErrorMessage(
@@ -73,6 +81,9 @@ class BookingRepository implements IBookingRepository {
         final apiModel = await _bookingRemoteDatasource.createBooking(
           createModel,
         );
+        await _bookingLocalDatasource.cacheMyBooking(
+          BookingHiveModel.fromApiModel(apiModel),
+        );
         return Right(apiModel.toEntity());
       } on DioException catch (e) {
         return Left(
@@ -98,6 +109,12 @@ class BookingRepository implements IBookingRepository {
       try {
         final apiModels = await _bookingRemoteDatasource.getMyBookings();
         final entities = BookingApiModel.toEntityList(apiModels);
+        final hiveModels = BookingHiveModel.fromApiModelList(apiModels);
+
+        await _bookingLocalDatasource.cacheMyBookings(
+          hiveModels,
+          amount: _bookingCacheLimit,
+        );
         return Right(entities);
       } on DioException catch (e) {
         return Left(
@@ -113,7 +130,14 @@ class BookingRepository implements IBookingRepository {
         return Left(ApiFailure(message: e.toString()));
       }
     } else {
-      return Left(ApiFailure(message: 'No Internet Connection'));
+      final cachedBookings = await _bookingLocalDatasource.getMyBookings();
+      if (cachedBookings.isNotEmpty) {
+        return Right(BookingHiveModel.toEntityList(cachedBookings));
+      }
+
+      return Left(
+        ApiFailure(message: 'No Internet Connection and no cached data'),
+      );
     }
   }
 
@@ -128,6 +152,9 @@ class BookingRepository implements IBookingRepository {
         );
 
         if (apiModel != null) {
+          await _bookingLocalDatasource.cacheMyBooking(
+            BookingHiveModel.fromApiModel(apiModel),
+          );
           return Right(apiModel.toEntity());
         }
 
@@ -146,7 +173,16 @@ class BookingRepository implements IBookingRepository {
         return Left(ApiFailure(message: e.toString()));
       }
     } else {
-      return Left(ApiFailure(message: 'No Internet Connection'));
+      final cachedBooking = await _bookingLocalDatasource.getMyBookingById(
+        bookingId,
+      );
+      if (cachedBooking != null) {
+        return Right(cachedBooking.toEntity());
+      }
+
+      return Left(
+        ApiFailure(message: 'No Internet Connection and no cached data'),
+      );
     }
   }
 }
