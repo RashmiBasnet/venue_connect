@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 class ApiEndpoints {
   ApiEndpoints._();
 
-  static const bool isPhysicalDevice = false;
-  static const String _ipAddress = '192.168.1.1';
+  static const bool isPhysicalDevice = true;
+  static const String _ipAddress = '192.168.101.7';
   static const int _port = 5050;
 
   static String get _host {
@@ -32,6 +32,26 @@ class ApiEndpoints {
   static const String uploadProfilePicture = '/user/profile/upload';
   static const String updateUserProfile = '/user/update-profile';
 
+  // =================== Venue Endpoints ===================
+  static const String venues = '/venues';
+
+  static String venueById(String venueId) => '$venues/$venueId';
+
+  // =================== Package Endpoints ===================
+  static const String packages = '/packages';
+
+  static String packageById(String packageId) => '$packages/$packageId';
+  static String packagesByVenueId(String venueId) => '$packages/venue/$venueId';
+
+  // =================== Booking Endpoints ===================
+  static const String bookings = '/booking';
+  static const String myBookings = '/booking/me';
+
+  static String myBookingById(String bookingId) => '$bookings/$bookingId';
+
   static String profilePicture(String filename) =>
+      '$mediaServerUrl/uploads/$filename';
+
+  static String venueImage(String filename) =>
       '$mediaServerUrl/uploads/$filename';
 }

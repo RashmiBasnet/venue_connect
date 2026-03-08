@@ -53,6 +53,32 @@ class UserRemoteDatasource implements IUserRemoteDatabase {
   }
 
   @override
+  Future<UserApiModel?> updateProfile({
+    required String fullName,
+    required String email,
+  }) async {
+    final token = _tokenService.getToken();
+    final response = await _apiClient.put(
+      ApiEndpoints.updateUserProfile,
+      data: {"fullName": fullName, "email": email},
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+
+    if (response.data["success"] == true) {
+      final user = UserApiModel.fromJson(response.data["data"]);
+      await _userSessionService.saveUserSession(
+        userId: user.userId!,
+        email: user.email,
+        fullName: user.fullName,
+        profilePicture: user.profilePicture,
+      );
+      return user;
+    }
+
+    return null;
+  }
+
+  @override
   Future<bool> isEmailExists(String email) {
     // TODO: implement isEmailExists
     throw UnimplementedError();

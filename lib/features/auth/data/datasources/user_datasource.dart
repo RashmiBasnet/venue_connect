@@ -17,6 +17,10 @@ abstract interface class IUserRemoteDatabase {
   Future<UserApiModel> register(UserApiModel model);
   Future<UserApiModel?> login(String email, String password);
   Future<UserApiModel?> getCurrentUser();
+  Future<UserApiModel?> updateProfile({
+    required String fullName,
+    required String email,
+  });
   Future<bool> logout();
 
   // get Email exists

@@ -1,17 +1,110 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:venue_connect/app/app.dart';
-import 'package:venue_connect/core/widgets/package_card.dart';
-import 'package:venue_connect/core/widgets/venue_card.dart';
+import 'package:venue_connect/app/routes/app_routes.dart';
+import 'package:venue_connect/core/api/api_endpoints.dart';
+import 'package:venue_connect/core/services/sensors/shake_service.dart';
+import 'package:venue_connect/core/services/storage/user_session_storage.dart';
+import 'package:venue_connect/features/auth/presentation/pages/login_screen.dart';
+import 'package:venue_connect/features/auth/presentation/view_model/user_viewmodel.dart';
+import 'package:venue_connect/features/package/domain/entities/package_entity.dart';
+import 'package:venue_connect/features/package/presentation/state/package_state.dart';
+import 'package:venue_connect/features/package/presentation/view_model/package_viewmodel.dart';
+import 'package:venue_connect/features/venue/domain/entities/venue_entity.dart';
+import 'package:venue_connect/features/venue/presentation/state/venue_state.dart';
+import 'package:venue_connect/features/venue/presentation/view_model/venue_viewmodel.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  late final ShakeService _shakeService;
+  DateTime _lastShakeTime = DateTime.fromMillisecondsSinceEpoch(0);
+  bool _isLogoutDialogOpen = false;
+  static const Duration _shakeCooldown = Duration(seconds: 2);
+
+  @override
+  void initState() {
+    super.initState();
+    _shakeService = ref.read(shakeServiceProvider);
+    _startShakeListener();
+    Future.microtask(() async {
+      await ref.read(venueViewmodelProvider.notifier).getAllVenues();
+      await ref
+          .read(packageViewmodelProvider.notifier)
+          .getAllPackages(page: 1, size: 4);
+    });
+  }
+
+  @override
+  void dispose() {
+    _shakeService.stopListening();
+    super.dispose();
+  }
+
+  void _startShakeListener() {
+    _shakeService.startListening(
+      onShake: () {
+        final now = DateTime.now();
+        if (now.difference(_lastShakeTime) < _shakeCooldown) return;
+        if (_isLogoutDialogOpen || !mounted) return;
+        _lastShakeTime = now;
+        _showShakeLogoutDialog();
+      },
+    );
+  }
+
+  Future<void> _showShakeLogoutDialog() async {
+    _isLogoutDialogOpen = true;
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Shake detected. Do you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+    _isLogoutDialogOpen = false;
+
+    if (shouldLogout != true || !mounted) return;
+
+    await ref.read(userViewmodelProvider.notifier).logout();
+    if (!mounted) return;
+    AppRoutes.pushAndRemoveUntil(context, const LoginScreen());
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final venueState = ref.watch(venueViewmodelProvider);
+    final packageState = ref.watch(packageViewmodelProvider);
+    final userSessionService = ref.watch(userSessionServiceProvider);
+    final username = userSessionService
+        .getCurrentUserFullName()!
+        .split(" ")
+        .first;
+
+    final venues = venueState.venues.take(4).toList();
+    final packages = packageState.packages
+        .where((package) => package.isActive)
+        .take(4)
+        .toList();
+
     return SafeArea(
       child: Stack(
         children: [
-          // Top right (leaf decoration)
           Positioned(
             top: -135,
             right: -210,
@@ -25,184 +118,115 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
-
-          // Whole Content
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // LOGO
-                  Row(
-                    children: [
-                      Image.asset(
-                        'assets/images/logo_blue.png',
-                        width: 110,
-                        height: 110,
-                        fit: BoxFit.contain,
+          RefreshIndicator(
+            onRefresh: () async {
+              await ref.read(venueViewmodelProvider.notifier).getAllVenues();
+              await ref
+                  .read(packageViewmodelProvider.notifier)
+                  .getAllPackages(page: 1, size: 4);
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Image.asset(
+                          'assets/images/logo_blue.png',
+                          width: 110,
+                          height: 110,
+                          fit: BoxFit.contain,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      "Hi, $username",
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
+                        color: kPrimaryDark,
                       ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // Greeting
-                  const Text(
-                    "Hi, Rashmi",
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 28,
-                      fontWeight: FontWeight.w600,
-                      color: kPrimaryDark,
                     ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Search bar
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: Colors.grey),
-                    ),
-                    child: Row(
-                      children: const [
-                        Icon(Icons.search, color: Colors.grey),
-                        SizedBox(width: 8),
-                        Text(
-                          "Search",
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Main Area(Packages + Venues)
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black45,
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: Colors.grey),
+                      ),
+                      child: const Row(
                         children: [
-                          // Packages header
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: const [
-                              Text(
-                                "Packages",
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: kPrimaryDark,
-                                ),
-                              ),
-                              Text(
-                                "See All",
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 14,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          // Packages(horizontal list)
-                          SizedBox(
-                            height: 300,
-                            child: ListView(
-                              scrollDirection: Axis.horizontal,
-                              children: const [
-                                PackageCard(
-                                  imagePath: 'assets/images/birthday.png',
-                                  title: 'Birthday\nPackage',
-                                ),
-                                SizedBox(width: 12),
-                                PackageCard(
-                                  imagePath: 'assets/images/outdoor.png',
-                                  title: 'Outdoor Party\nPackage',
-                                ),
-                              ],
+                          Icon(Icons.search, color: Colors.grey),
+                          SizedBox(width: 8),
+                          Text(
+                            'Search',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 14,
+                              color: Colors.grey,
                             ),
-                          ),
-
-                          // Dot indicator
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _dot(true),
-                              const SizedBox(width: 4),
-                              _dot(false),
-                              const SizedBox(width: 4),
-                              _dot(false),
-                            ],
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          // Venues header
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: const [
-                              Text(
-                                "Venues",
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: kPrimaryDark,
-                                ),
-                              ),
-                              Text(
-                                "See All",
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 14,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          // Venue card
-                          const VenueCard(
-                            imagePath: 'assets/images/lord_palace.png',
-                            name: 'Lord Palace Banquet',
-                            address: 'P8VC+7WJ, Tokha Rd,\nKathmandu',
                           ),
                         ],
                       ),
                     ),
-                  ),
-
-                  const SizedBox(height: 16),
-                ],
+                    const SizedBox(height: 24),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Packages',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: kPrimaryDark,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            _buildPackageSection(packageState, packages),
+                            const Text(
+                              'Venues',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: kPrimaryDark,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            _buildVenueSection(venueState, venues),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
             ),
           ),
@@ -211,13 +235,257 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  static Widget _dot(bool active) {
+  Widget _buildPackageSection(
+    PackageState state,
+    List<PackageEntity> packages,
+  ) {
+    if (state.status == PackageStatus.loading && state.packages.isEmpty) {
+      return const SizedBox(
+        height: 220,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (state.status == PackageStatus.error && state.packages.isEmpty) {
+      return Text(
+        state.errorMessage ?? 'Failed to load packages',
+        style: const TextStyle(
+          fontFamily: 'Poppins Regular',
+          fontSize: 13,
+          color: Color(0xFFB91C1C),
+        ),
+      );
+    }
+
+    if (packages.isEmpty) {
+      return const Text(
+        'No packages available',
+        style: TextStyle(
+          fontFamily: 'Poppins Regular',
+          fontSize: 13,
+          color: Colors.black54,
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: 240,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: packages.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final package = packages[index];
+          return _HomePackageCard(package: package);
+        },
+      ),
+    );
+  }
+
+  Widget _buildVenueSection(VenueState state, List<VenueEntity> venues) {
+    if (state.status == VenueStatus.loading && state.venues.isEmpty) {
+      return const SizedBox(
+        height: 160,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (state.status == VenueStatus.error && state.venues.isEmpty) {
+      return Text(
+        state.errorMessage ?? 'Failed to load venues',
+        style: const TextStyle(
+          fontFamily: 'Poppins Regular',
+          fontSize: 13,
+          color: Color(0xFFB91C1C),
+        ),
+      );
+    }
+
+    if (venues.isEmpty) {
+      return const Text(
+        'No venues available',
+        style: TextStyle(
+          fontFamily: 'Poppins Regular',
+          fontSize: 13,
+          color: Colors.black54,
+        ),
+      );
+    }
+
+    return Column(
+      children: venues
+          .map(
+            (venue) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _HomeVenueCard(venue: venue),
+            ),
+          )
+          .toList(),
+    );
+  }
+}
+
+class _HomePackageCard extends StatelessWidget {
+  final PackageEntity package;
+
+  const _HomePackageCard({required this.package});
+
+  @override
+  Widget build(BuildContext context) {
+    final imageName = package.images.isNotEmpty ? package.images.first : null;
+
     return Container(
-      width: active ? 8 : 6,
-      height: active ? 8 : 6,
+      width: 190,
       decoration: BoxDecoration(
-        color: active ? Colors.black87 : Colors.grey.shade400,
-        shape: BoxShape.circle,
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+            child: SizedBox(
+              height: 120,
+              width: double.infinity,
+              child: imageName == null
+                  ? Container(
+                      color: const Color(0xFFF1F5F9),
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.image_outlined),
+                    )
+                  : Image.network(
+                      ApiEndpoints.venueImage(imageName),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: const Color(0xFFF1F5F9),
+                        alignment: Alignment.center,
+                        child: const Icon(Icons.broken_image_outlined),
+                      ),
+                    ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  package.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: 'Poppins SemiBold',
+                    fontSize: 14,
+                    color: kPrimaryDark,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'NPR ${package.pricePerPlate.toStringAsFixed(0)}/plate',
+                  style: const TextStyle(
+                    fontFamily: 'Poppins Medium',
+                    fontSize: 13,
+                    color: Color(0xFF475569),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HomeVenueCard extends StatelessWidget {
+  final VenueEntity venue;
+
+  const _HomeVenueCard({required this.venue});
+
+  @override
+  Widget build(BuildContext context) {
+    final imageName = venue.images.isNotEmpty ? venue.images.first : null;
+    final address = [
+      if ((venue.address.area ?? '').trim().isNotEmpty)
+        venue.address.area!.trim(),
+      venue.address.city,
+    ].join(', ');
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.horizontal(
+              left: Radius.circular(16),
+            ),
+            child: SizedBox(
+              width: 110,
+              height: 92,
+              child: imageName == null
+                  ? Container(
+                      color: const Color(0xFFF1F5F9),
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.image_outlined),
+                    )
+                  : Image.network(
+                      ApiEndpoints.venueImage(imageName),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: const Color(0xFFF1F5F9),
+                        alignment: Alignment.center,
+                        child: const Icon(Icons.broken_image_outlined),
+                      ),
+                    ),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    venue.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontFamily: 'Poppins SemiBold',
+                      fontSize: 14,
+                      color: kPrimaryDark,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    address,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontFamily: 'Poppins Regular',
+                      fontSize: 12,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'NPR ${venue.pricePerPlate.toStringAsFixed(0)}/plate',
+                    style: const TextStyle(
+                      fontFamily: 'Poppins Medium',
+                      fontSize: 12,
+                      color: Color(0xFF475569),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

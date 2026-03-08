@@ -62,6 +62,39 @@ class UserRepository implements IUserRepository {
   }
 
   @override
+  Future<Either<Failure, UserEntity>> updateProfile({
+    required String fullName,
+    required String email,
+  }) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final apiModel = await _userRemoteDatabase.updateProfile(
+          fullName: fullName,
+          email: email,
+        );
+        if (apiModel != null) {
+          return Right(apiModel.toEntity());
+        }
+        return Left(ApiFailure(message: "Failed to update profile"));
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data?["message"] ??
+                e.message ??
+                "Profile update failed",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return Left(ApiFailure(message: "No Internet Connection"));
+    }
+  }
+
+  @override
   Future<Either<Failure, UserEntity>> login(
     String email,
     String password,

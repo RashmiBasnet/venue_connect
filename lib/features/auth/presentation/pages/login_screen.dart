@@ -34,7 +34,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      await ref.read(userViewmodelProvider.notifier).login(
+      await ref
+          .read(userViewmodelProvider.notifier)
+          .login(
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
           );
@@ -53,12 +55,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final size = MediaQuery.of(context).size;
     final screenWidth = size.width;
     final bool isTablet = screenWidth >= 600;
+    final userState = ref.watch(userViewmodelProvider);
 
     ref.listen<UserState>(userViewmodelProvider, (previous, next) {
       if (next.status == UserStatus.authenticated) {
         AppRoutes.pushReplacement(context, const BottomScreenLayout());
       } else if (next.status == UserStatus.error) {
-        SnackbarUtils.showError(context, next.errorMessage ?? "An error occurred");
+        SnackbarUtils.showError(
+          context,
+          next.errorMessage ?? "An error occurred",
+        );
       }
     });
 
@@ -85,7 +91,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             Align(
               alignment: Alignment.topCenter,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     maxWidth: isTablet ? 480 : double.infinity,
@@ -121,10 +130,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                       const Text(
                         "Welcome back!\nPlease login to continue",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
 
                       const SizedBox(height: 30),
@@ -162,18 +168,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               icon: Icons.lock_outline,
                               isPassword: _obscurePassword,
                               suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: Colors.grey,
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
-                            ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter a password';
@@ -210,6 +216,55 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ),
                               ),
                             ),
+
+                            if (userState.biometricEnabled) ...[
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                width: double.infinity,
+                                child: OutlinedButton.icon(
+                                  onPressed: userState.biometricLoading
+                                      ? null
+                                      : () async {
+                                          await ref
+                                              .read(
+                                                userViewmodelProvider.notifier,
+                                              )
+                                              .loginWithBiometrics();
+                                        },
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(
+                                      color: kAccentGold,
+                                      width: 1.2,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                  ),
+                                  icon: userState.biometricLoading
+                                      ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : const Icon(Icons.fingerprint),
+                                  label: Text(
+                                    userState.biometricLoading
+                                        ? "Authenticating..."
+                                        : "Login with Biometrics",
+                                    style: const TextStyle(
+                                      fontFamily: "Poppins Medium",
+                                      fontSize: 15,
+                                      color: kPrimaryDark,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
 
                             const SizedBox(height: 16),
 

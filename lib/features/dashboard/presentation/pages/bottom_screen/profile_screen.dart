@@ -8,7 +8,9 @@ import 'package:venue_connect/app/routes/app_routes.dart';
 import 'package:venue_connect/core/api/api_endpoints.dart';
 import 'package:venue_connect/core/services/storage/user_session_storage.dart';
 import 'package:venue_connect/core/utils/snackbar_utils.dart';
+import 'package:venue_connect/features/auth/presentation/pages/edit_profile_screen.dart';
 import 'package:venue_connect/features/auth/presentation/pages/login_screen.dart';
+import 'package:venue_connect/features/auth/presentation/state/user_state.dart';
 import 'package:venue_connect/features/auth/presentation/view_model/user_viewmodel.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -153,6 +155,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final userSessionService = ref.watch(userSessionServiceProvider);
+    final userState = ref.watch(userViewmodelProvider);
 
     final userName = userSessionService.getCurrentUserFullName() ?? "User";
     final userEmail =
@@ -162,8 +165,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         (profileFileName != null && profileFileName.isNotEmpty)
         ? ApiEndpoints.profilePicture(profileFileName)
         : null;
-
-    final theme = Theme.of(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F7F7),
@@ -325,21 +326,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             _SettingsTile(
                               icon: Icons.edit_note,
                               title: "Edit profile information",
-                              onTap: () {},
-                            ),
-                            _SettingsTile(
-                              icon: Icons.notifications_none,
-                              title: "Notifications",
-                              trailingText: "ON",
-                              trailingTextColor: const Color(0xFFB07C5E),
-                              onTap: () {},
-                            ),
-                            _SettingsTile(
-                              icon: Icons.translate,
-                              title: "Language",
-                              trailingText: "English",
-                              trailingTextColor: const Color(0xFFB07C5E),
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const EditProfileScreen(),
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -348,17 +342,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
                         _SettingsCard(
                           children: [
-                            _SettingsTile(
-                              icon: Icons.security,
-                              title: "Security",
-                              onTap: () {},
-                            ),
-                            _SettingsTile(
-                              icon: Icons.palette_outlined,
-                              title: "Theme",
-                              trailingText: "Light mode",
-                              trailingTextColor: const Color(0xFFB07C5E),
-                              onTap: () {},
+                            _SettingsSwitchTile(
+                              icon: Icons.fingerprint,
+                              title: "Enable biometric login",
+                              value: userState.biometricEnabled,
+                              onChanged: (enabled) async {
+                                await ref
+                                    .read(userViewmodelProvider.notifier)
+                                    .setBiometricEnabled(enabled);
+
+                                if (!mounted) return;
+
+                                final updatedState = ref.read(
+                                  userViewmodelProvider,
+                                );
+                                if (updatedState.status == UserStatus.error &&
+                                    updatedState.errorMessage != null) {
+                                  SnackbarUtils.showError(
+                                    this.context,
+                                    updatedState.errorMessage!,
+                                  );
+                                }
+                              },
                             ),
                           ],
                         ),
@@ -388,7 +393,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         const SizedBox(height: 26),
 
                         SizedBox(
-                          width: 180,
+                          width: 100,
                           height: 52,
                           child: ElevatedButton(
                             onPressed: () => _showLogoutDialog(context),
@@ -402,7 +407,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             child: const Text(
                               "Logout",
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 17,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
                               ),
@@ -489,22 +494,12 @@ class _SettingsCard extends StatelessWidget {
 class _SettingsTile extends StatelessWidget {
   final IconData icon;
   final String title;
-  final String? trailingText;
-  final Color? trailingTextColor;
   final VoidCallback? onTap;
 
-  const _SettingsTile({
-    required this.icon,
-    required this.title,
-    this.trailingText,
-    this.trailingTextColor,
-    this.onTap,
-  });
+  const _SettingsTile({required this.icon, required this.title, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final showTrailing = trailingText != null;
-
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -522,17 +517,46 @@ class _SettingsTile extends StatelessWidget {
                 ),
               ),
             ),
-            if (showTrailing)
-              Text(
-                trailingText!,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: trailingTextColor ?? Colors.black54,
-                ),
-              ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SettingsSwitchTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _SettingsSwitchTile({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 26, color: Colors.black),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+          ),
+          Switch(
+            value: value,
+            activeThumbColor: const Color(0xFFB07C5E),
+            onChanged: onChanged,
+          ),
+        ],
       ),
     );
   }
