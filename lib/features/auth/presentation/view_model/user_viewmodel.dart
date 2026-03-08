@@ -9,6 +9,7 @@ import 'package:venue_connect/features/auth/domain/usecases/get_current_user_use
 import 'package:venue_connect/features/auth/domain/usecases/login_usecase.dart';
 import 'package:venue_connect/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:venue_connect/features/auth/domain/usecases/register_usecase.dart';
+import 'package:venue_connect/features/auth/domain/usecases/update_profile_usecase.dart';
 import 'package:venue_connect/features/auth/domain/usecases/upload_profile_picture_usecase.dart';
 import 'package:venue_connect/features/auth/presentation/state/user_state.dart';
 
@@ -21,6 +22,7 @@ class UserViewmodel extends Notifier<UserState> {
   late final LoginUsecase _loginUsecase;
   late final LogoutUsecase _logoutUsecase;
   late final GetCurrentUserUsecase _getCurrentUserUsecase;
+  late final UpdateProfileUsecase _updateProfileUsecase;
   late final UploadProfilePictureUsecase _uploadProfilePictureUsecase;
   late final BiometricService _biometricService;
   late final BiometricPrefService _biometricPrefService;
@@ -32,6 +34,7 @@ class UserViewmodel extends Notifier<UserState> {
     _loginUsecase = ref.read(loginUsecaseProvider);
     _logoutUsecase = ref.read(logoutUsecaseProvider);
     _getCurrentUserUsecase = ref.read(getCurrentUserUsecaseProvider);
+    _updateProfileUsecase = ref.read(updateProfileUsecaseProvider);
     _uploadProfilePictureUsecase = ref.read(
       uploadProfilePictureUsecaseProvider,
     );
@@ -165,6 +168,30 @@ class UserViewmodel extends Notifier<UserState> {
       },
       (entity) {
         state = state.copyWith(status: UserStatus.loaded, userEntity: entity);
+      },
+    );
+  }
+
+  Future<bool> updateProfile({
+    required String fullName,
+    required String email,
+  }) async {
+    state = state.copyWith(status: UserStatus.loading, clearError: true);
+    final result = await _updateProfileUsecase(
+      UpdateProfileUsecaseParams(fullName: fullName, email: email),
+    );
+
+    return result.fold(
+      (failure) {
+        state = state.copyWith(
+          status: UserStatus.error,
+          errorMessage: failure.message,
+        );
+        return false;
+      },
+      (entity) {
+        state = state.copyWith(status: UserStatus.loaded, userEntity: entity);
+        return true;
       },
     );
   }
